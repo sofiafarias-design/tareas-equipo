@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tracker de Tareas - Realtime</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* --- AQUÍ ESTÁ TODO TU DISEÑO ORIGINAL --- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #f7f6f3; --surface: #ffffff; --border: #e4e2dc; --border-strong: #ccc9c0;
+  --text: #1a1916; --text-muted: #7a7870; --text-faint: #b0ada5;
+  --accent: #1D9E75; --accent-bg: #e1f5ee; --accent-text: #0a5c42;
+  --warn: #c4620f; --danger: #b92b2b; --danger-bg: #fcebeb; --danger-text: #7a1a1a;
+  --prio-alta-bg: #faece7; --prio-alta-text: #8a3018;
+  --prio-media-bg: #faeeda; --prio-media-text: #7a3c08;
+  --prio-baja-bg: #eaf3de; --prio-baja-text: #2e5a0a;
+  --radius: 8px; --radius-lg: 12px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+}
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 0 0 3rem; }
+.site-header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 1.1rem 1.5rem; display: flex; align-items: center; gap: 1rem; position: sticky; top: 0; z-index: 10; box-shadow: var(--shadow); }
+.site-header h1 { font-size: 17px; font-weight: 500; flex: 1; }
+.site-header .subtitle { font-size: 12px; color: var(--text-muted); font-family: 'DM Mono', monospace; }
+.btn-back { font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text-muted); background: none; border: 1px solid var(--border); border-radius: var(--radius); padding: 5px 12px; cursor: pointer; display: flex; align-items: center; gap: 5px; transition: all .15s; white-space: nowrap; }
+.btn-back:hover { border-color: var(--border-strong); color: var(--text); }
+.page { display: none; }
+.page.active { display: block; }
+.container { max-width: 100%; padding: 1.25rem; }
+.stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 1.25rem; }
+.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: .85rem 1rem; box-shadow: var(--shadow); }
+.stat-num { font-size: 24px; font-weight: 300; font-family: 'DM Mono', monospace; line-height: 1; margin-bottom: 3px; }
+.stat-num.green { color: var(--accent); } .stat-num.orange { color: var(--warn); } .stat-num.red { color: var(--danger); }
+.stat-label { font-size: 11px; color: var(--text-muted); }
+.form-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1rem; margin-bottom: 1.25rem; box-shadow: var(--shadow); }
+.form-title { font-size: 11px; font-weight: 500; color: var(--text-muted); letter-spacing: .5px; text-transform: uppercase; margin-bottom: .85rem; }
+.form-group { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 130px; }
+.form-group label { font-size: 11px; color: var(--text-muted); }
+.form-group input, .form-group select, .form-group textarea { font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 7px 10px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); color: var(--text); outline: none; width: 100%; transition: border-color .15s; }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--accent); background: #fff; }
+.form-group.tarea { flex: 3; min-width: 180px; } .form-group.desc { width: 100%; flex: none; } .form-group.resp { flex: 2; min-width: 150px; } .form-group.fecha { flex: 1.5; min-width: 130px; } .form-group.prio { flex: 1; min-width: 110px; }
+.form-group textarea { resize: vertical; min-height: 58px; line-height: 1.5; }
+.form-row-top { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 8px; }
+.form-row-bottom { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-end; }
+.btn-add { font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; padding: 7px 18px; background: var(--accent); color: #fff; border: none; border-radius: var(--radius); cursor: pointer; white-space: nowrap; align-self: flex-end; height: 36px; transition: opacity .15s; }
+.btn-add:hover { opacity: .87; }
+.folders-title { font-size: 11px; font-weight: 500; color: var(--text-faint); letter-spacing: .5px; text-transform: uppercase; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+.folder { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); margin-bottom: 10px; cursor: pointer; box-shadow: var(--shadow); transition: border-color .15s, box-shadow .15s; }
+.folder:hover { border-color: var(--accent); box-shadow: 0 2px 8px rgba(29,158,117,.1); }
+.folder-header { display: flex; align-items: center; gap: 12px; padding: 14px 16px; }
+.avatar { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 500; flex-shrink: 0; }
+.av-m { background: var(--accent-bg); color: var(--accent-text); }
+.av-i { background: #e6f1fb; color: #185fa5; }
+.folder-name { font-size: 15px; font-weight: 500; flex: 1; }
+.folder-meta { display: flex; align-items: center; gap: 6px; }
+.pill { font-size: 11px; padding: 2px 9px; border-radius: 99px; background: var(--bg); color: var(--text-muted); }
+.pill.urgent { background: var(--prio-alta-bg); color: var(--prio-alta-text); }
+.persona-header { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1rem 1.25rem; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 14px; box-shadow: var(--shadow); }
+.persona-avatar { width: 46px; height: 46px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 500; flex-shrink: 0; }
+.persona-name { font-size: 17px; font-weight: 500; margin-bottom: 2px; }
+.persona-sub { font-size: 12px; color: var(--text-muted); }
+.top-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: .85rem; }
+.filters { display: flex; gap: 6px; flex-wrap: wrap; }
+.filter-btn { font-family: 'DM Sans', sans-serif; font-size: 12px; padding: 4px 13px; border: 1px solid var(--border); border-radius: 99px; background: var(--surface); color: var(--text-muted); cursor: pointer; transition: all .15s; }
+.filter-btn.active { background: var(--text); color: #fff; border-color: var(--text); }
+.filter-btn:hover:not(.active) { border-color: var(--border-strong); color: var(--text); }
+.btn-export { font-family: 'DM Mono', monospace; font-size: 11px; padding: 5px 12px; border: 1px solid var(--border-strong); border-radius: var(--radius); background: var(--surface); color: var(--text-muted); cursor: pointer; transition: all .15s; }
+.btn-export:hover { border-color: var(--text); color: var(--text); }
+.table-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow); overflow: hidden; }
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+col.ck { width: 44px; } col.ct { width: auto; } col.cf { width: 140px; } col.cp { width: 82px; } col.ce { width: 98px; } col.ca { width: 44px; }
+thead tr { border-bottom: 1px solid var(--border); }
+th { font-size: 10px; font-weight: 500; color: var(--text-faint); text-align: left; padding: 11px 13px; letter-spacing: .6px; text-transform: uppercase; white-space: nowrap; background: var(--bg); }
+th.center { text-align: center; }
+tbody tr { border-bottom: 1px solid var(--border); transition: background .1s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: #fafaf8; }
+td { padding: 11px 13px; vertical-align: middle; font-size: 13px; }
+td.center { text-align: center; }
+input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; }
+.task-name { font-weight: 400; line-height: 1.4; outline: none; border-radius: 4px; padding: 2px 3px; margin: -2px -3px; display: block; }
+.task-name:focus { outline: 1px solid var(--accent); background: var(--bg); }
+.task-name.done-t { text-decoration: line-through; color: var(--text-faint); }
+.btn-del { background: none; border: none; cursor: pointer; color: var(--text-faint); font-size: 17px; line-height: 1; padding: 3px 6px; border-radius: var(--radius); transition: color .15s, background .15s; }
+.btn-del:hover { color: var(--danger); background: var(--danger-bg); }
+.empty-state { text-align: center; padding: 2.5rem; color: var(--text-faint); font-size: 13px; }
+</style>
+</head>
+<body>
+
+<div class="page active" id="pg-home">
+  <header class="site-header">
+    <h1>Tracker de Tareas</h1>
+    <span class="subtitle">seguimiento del equipo</span>
+  </header>
+  <main class="container">
+    <div class="form-card">
+      <div class="form-title">Nueva tarea</div>
+      <div class="form-row-top">
+        <div class="form-group tarea"><label>Título de la tarea</label><input type="text" id="inp-tarea" placeholder="Nombre de la tarea..."></div>
+        <div class="form-group resp"><label>Responsable</label>
+          <select id="inp-resp">
+            <option value="">— Seleccionar —</option>
+            <option value="María Balestrini">María Balestrini</option>
+            <option value="Ignacio Ríos">Ignacio Ríos</option>
+          </select>
+        </div>
+        <div class="form-group fecha"><label>Fecha de entrega</label><input type="date" id="inp-fecha"></div>
+        <div class="form-group" style="flex:1;min-width:100px"><label>Hora</label><input type="time" id="inp-hora"></div>
+        <div class="form-group prio"><label>Prioridad</label>
+          <select id="inp-prio">
+            <option value="media">Media</option>
+            <option value="alta">Alta</option>
+            <option value="baja">Baja</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row-bottom">
+        <div class="form-group desc"><label>Descripción / detalles</label><textarea id="inp-desc" placeholder="Instrucciones, contexto, detalles..."></textarea></div>
+        <button class="btn-add" onclick="addTask()">+ Agregar</button>
+      </div>
+    </div>
+    <div class="folders-title">Tareas por persona</div>
+    <div class="folder" onclick="goTo('mary')">
+      <div class="folder-header">
+        <div class="avatar av-m">MB</div>
+        <span class="folder-name">Mary</span>
+        <div class="folder-meta">
+          <span class="pill urgent" id="home-mary-urgent" style="display:none"></span>
+          <span class="pill" id="home-mary-count">0 pendientes</span>
+          <span style="font-size:18px;color:var(--text-faint)">›</span>
+        </div>
+      </div>
+    </div>
+    <div class="folder" onclick="goTo('nacho')">
+      <div class="folder-header">
+        <div class="avatar av-i">IR</div>
+        <span class="folder-name">Nacho</span>
+        <div class="folder-meta">
+          <span class="pill urgent" id="home-nacho-urgent" style="display:none"></span>
+          <span class="pill" id="home-nacho-count">0 pendientes</span>
+          <span style="font-size:18px;color:var(--text-faint)">›</span>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="page" id="pg-mary">
+  <header class="site-header">
+    <button class="btn-back" onclick="goTo('home')">← Volver</button>
+    <h1>Tracker de Tareas</h1>
+  </header>
+  <main class="container">
+    <div class="persona-header">
+      <div class="persona-avatar av-m">MB</div>
+      <div><div class="persona-name">Mary</div><div class="persona-sub" id="mary-sub">—</div></div>
+    </div>
+    <div class="stats">
+      <div class="stat-card"><div class="stat-num" id="mary-total">0</div><div class="stat-label">Total</div></div>
+      <div class="stat-card"><div class="stat-num green" id="mary-listas">0</div><div class="stat-label">Listas</div></div>
+      <div class="stat-card"><div class="stat-num orange" id="mary-pend">0</div><div class="stat-label">Pend.</div></div>
+      <div class="stat-card"><div class="stat-num red" id="mary-venc">0</div><div class="stat-label">Venc.</div></div>
+    </div>
+    <div class="table-card"><div class="table-wrap">
+      <table><thead><tr><th class="center">✓</th><th>Tarea</th><th>Entrega</th><th>Prio</th><th>Estado</th><th></th></tr></thead>
+      <tbody id="tbody-mary"></tbody></table>
+    </div></div>
+  </main>
+</div>
+
+<div class="page" id="pg-nacho">
+  <header class="site-header">
+    <button class="btn-back" onclick="goTo('home')">← Volver</button>
+    <h1>Tracker de Tareas</h1>
+  </header>
+  <main class="container">
+    <div class="persona-header">
+      <div class="persona-avatar av-i">IR</div>
+      <div><div class="persona-name">Nacho</div><div class="persona-sub" id="nacho-sub">—</div></div>
+    </div>
+    <div class="stats">
+      <div class="stat-card"><div class="stat-num" id="nacho-total">0</div><div class="stat-label">Total</div></div>
+      <div class="stat-card"><div class="stat-num green" id="nacho-listas">0</div><div class="stat-label">Listas</div></div>
+      <div class="stat-card"><div class="stat-num orange" id="nacho-pend">0</div><div class="stat-label">Pend.</div></div>
+      <div class="stat-card"><div class="stat-num red" id="nacho-venc">0</div><div class="stat-label">Venc.</div></div>
+    </div>
+    <div class="table-card"><div class="table-wrap">
+      <table><thead><tr><th class="center">✓</th><th>Tarea</th><th>Entrega</th><th>Prio</th><th>Estado</th><th></th></tr></thead>
+      <tbody id="tbody-nacho"></tbody></table>
+    </div></div>
+  </main>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  // CONFIGURACIÓN DE SOFÍA
+  const firebaseConfig = {
+    apiKey: "AIzaSyBJUzoXkS-x6t4sbR-RePchWSD2923x2Vg",
+    authDomain: "tareas-b31fa.firebaseapp.com",
+    projectId: "tareas-b31fa",
+    storageBucket: "tareas-b31fa.firebasestorage.app",
+    messagingSenderId: "121581147046",
+    appId: "1:121581147046:web:4d30f237e4924dcb3db567",
+    measurementId: "G-GCBBRM72D6"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const tasksRef = collection(db, "tareas_equipo");
+
+  let tasks = [];
+
+  // FUNCIONES GLOBALES (Para que funcionen los botones)
+  window.goTo = (id) => {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('pg-'+id).classList.add('active');
+    renderAll();
+  };
+
+  window.addTask = async () => {
+    const tarea = document.getElementById('inp-tarea').value.trim();
+    const resp = document.getElementById('inp-resp').value;
+    if(!tarea || !resp) return alert("Completa tarea y responsable");
+    
+    await addDoc(tasksRef, {
+      tarea, resp,
+      desc: document.getElementById('inp-desc').value,
+      fecha: document.getElementById('inp-fecha').value,
+      hora: document.getElementById('inp-hora').value,
+      prio: document.getElementById('inp-prio').value,
+      done: false, creadaEn: Date.now()
+    });
+    
+    document.getElementById('inp-tarea').value = '';
+  };
+
+  window.toggle = async (id, currentStatus) => {
+    await updateDoc(doc(db, "tareas_equipo", id), { done: !currentStatus });
+  };
+
+  window.del = async (id) => {
+    if(confirm("¿Eliminar?")) await deleteDoc(doc(db, "tareas_equipo", id));
+  };
+
+  // ESCUCHAR CAMBIOS EN VIVO
+  onSnapshot(query(tasksRef, orderBy("creadaEn", "desc")), (snap) => {
+    tasks = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderAll();
+  });
+
+  // RENDERIZADO
+  function renderAll() {
+    renderHome();
+    renderPersona('mary', 'María Balestrini');
+    renderPersona('nacho', 'Ignacio Ríos');
+  }
+
+  function renderHome() {
+    [['mary','María Balestrini'],['nacho','Ignacio Ríos']].forEach(([key, name]) => {
+      const mine = tasks.filter(t => t.resp === name && !t.done);
+      document.getElementById(`home-${key}-count`).innerText = `${mine.length} pendientes`;
+    });
+  }
+
+  function renderPersona(key, name) {
+    const mine = tasks.filter(t => t.resp === name);
+    const tbody = document.getElementById(`tbody-${key}`);
+    if(!tbody) return;
+
+    // Actualizar Stats
+    document.getElementById(`${key}-total`).innerText = mine.length;
+    document.getElementById(`${key}-listas`).innerText = mine.filter(t => t.done).length;
+    document.getElementById(`${key}-pend`).innerText = mine.filter(t => !t.done).length;
+
+    tbody.innerHTML = mine.map(t => `
+      <tr>
+        <td class="center"><input type="checkbox" ${t.done?'checked':''} onchange="toggle('${t.id}', ${t.done})"></td>
+        <td class="${t.done?'done-t':''}">${t.tarea}</td>
+        <td>${t.fecha || '—'}</td>
+        <td>${t.prio}</td>
+        <td>${t.done?'Listo':'Pendiente'}</td>
+        <td><button class="btn-del" onclick="del('${t.id}')">×</button></td>
+      </tr>
+    `).join('');
+  }
+</script>
+</body>
+</html>

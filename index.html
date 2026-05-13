@@ -3,16 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tracker de Tareas - Realtime</title>
+<title>Tracker de Tareas</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-/* --- TU DISEÑO ORIGINAL --- */
+/* --- TUS COLORES Y DISEÑO ORIGINAL --- */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
   --bg: #f7f6f3; --surface: #ffffff; --border: #e4e2dc; --border-strong: #ccc9c0;
   --text: #1a1916; --text-muted: #7a7870; --text-faint: #b0ada5;
   --accent: #1D9E75; --accent-bg: #e1f5ee; --accent-text: #0a5c42;
   --warn: #c4620f; --danger: #b92b2b; --danger-bg: #fcebeb; --danger-text: #7a1a1a;
+  --prio-alta-bg: #faece7; --prio-alta-text: #8a3018;
+  --prio-media-bg: #faeeda; --prio-media-text: #7a3c08;
+  --prio-baja-bg: #eaf3de; --prio-baja-text: #2e5a0a;
   --radius: 8px; --radius-lg: 12px;
   --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
 }
@@ -26,18 +29,21 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 .form-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1rem; margin-bottom: 1.25rem; box-shadow: var(--shadow); }
 .form-group { display: flex; flex-direction: column; gap: 4px; flex: 1; }
 .form-group label { font-size: 11px; color: var(--text-muted); }
-.form-group input, .form-group select, .form-group textarea { font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 7px 10px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); outline: none; }
-.form-row-top { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
-.btn-add { background: var(--accent); color: #fff; border: none; padding: 7px 18px; border-radius: var(--radius); cursor: pointer; height: 36px; align-self: flex-end; }
-.folder { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); margin-bottom: 10px; padding: 14px 16px; cursor: pointer; display: flex; align-items: center; gap: 12px; }
-.table-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+.form-group input, .form-group select, .form-group textarea { font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 7px 10px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); color: var(--text); outline: none; }
+.form-row-top { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 8px; }
+.btn-add { font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; padding: 7px 18px; background: var(--accent); color: #fff; border: none; border-radius: var(--radius); cursor: pointer; height: 36px; }
+.folder { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); margin-bottom: 10px; padding: 14px 16px; cursor: pointer; display: flex; align-items: center; gap: 12px; box-shadow: var(--shadow); }
+.avatar { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 500; }
+.av-m { background: var(--accent-bg); color: var(--accent-text); }
+.av-i { background: #e6f1fb; color: #185fa5; }
+.table-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow); overflow: hidden; }
 table { width: 100%; border-collapse: collapse; }
-th { font-size: 10px; color: var(--text-faint); text-align: left; padding: 11px 13px; background: var(--bg); text-transform: uppercase; }
+th { font-size: 10px; font-weight: 500; color: var(--text-faint); text-align: left; padding: 11px 13px; text-transform: uppercase; background: var(--bg); }
 td { padding: 11px 13px; font-size: 13px; border-bottom: 1px solid var(--border); }
-.task-desc { font-size: 11px; color: var(--text-muted); background: #fafaf8; padding: 8px 13px; border-bottom: 1px solid var(--border); }
-.editable-input { border: 1px dashed transparent; background: none; font-family: inherit; font-size: inherit; width: 100%; cursor: pointer; }
-.editable-input:hover { border-color: var(--border-strong); }
-.editable-input:focus { border-style: solid; border-color: var(--accent); background: #fff; cursor: text; }
+.btn-expand { background: var(--accent-bg); border: none; cursor: pointer; color: var(--accent-text); font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 99px; margin-top: 5px; }
+.task-desc-row { background: #fafaf8; display: none; }
+.task-desc-content { padding: 10px 14px; font-size: 12px; color: var(--text); border: 1px solid var(--border); border-radius: var(--radius); margin: 0 13px 13px; }
+.done-t { text-decoration: line-through; color: var(--text-faint); }
 </style>
 </head>
 <body>
@@ -47,8 +53,9 @@ td { padding: 11px 13px; font-size: 13px; border-bottom: 1px solid var(--border)
   <main class="container">
     <div class="form-card">
       <div class="form-row-top">
-        <div class="form-group" style="flex:3"><label>Tarea</label><input type="text" id="inp-tarea"></div>
-        <div class="form-group" style="flex:2"><label>Responsable</label>
+        <div class="form-group" style="flex:3"><label>Título</label><input type="text" id="inp-tarea"></div>
+        <div class="form-group" style="flex:2">
+          <label>Responsable</label>
           <select id="inp-resp">
             <option value="">— Seleccionar —</option>
             <option value="María Balestrini">María Balestrini</option>
@@ -58,13 +65,13 @@ td { padding: 11px 13px; font-size: 13px; border-bottom: 1px solid var(--border)
         <div class="form-group"><label>Entrega</label><input type="date" id="inp-fecha"></div>
         <div class="form-group"><label>Hora</label><input type="time" id="inp-hora"></div>
       </div>
-      <div style="display:flex; gap:8px">
-        <div class="form-group"><label>Detalles</label><textarea id="inp-desc" rows="2"></textarea></div>
+      <div style="display:flex; gap:8px; align-items: flex-end;">
+        <div class="form-group"><label>Descripción</label><textarea id="inp-desc" rows="2"></textarea></div>
         <button class="btn-add" onclick="addTask()">+ Agregar</button>
       </div>
     </div>
-    <div class="folder" onclick="goTo('mary')"><span>MB</span> <strong>Mary</strong></div>
-    <div class="folder" onclick="goTo('nacho')"><span>IR</span> <strong>Nacho</strong></div>
+    <div class="folder" onclick="goTo('mary')"><div class="avatar av-m">MB</div><strong>Mary</strong></div>
+    <div class="folder" onclick="goTo('nacho')"><div class="avatar av-i">IR</div><strong>Nacho</strong></div>
   </main>
 </div>
 
@@ -76,7 +83,7 @@ td { padding: 11px 13px; font-size: 13px; border-bottom: 1px solid var(--border)
   <main class="container">
     <div class="table-card">
       <table>
-        <thead><tr><th>✓</th><th>Tarea / Detalles</th><th>Fecha</th><th>Hora</th><th></th></tr></thead>
+        <thead><tr><th>✓</th><th>Tarea</th><th>Fecha</th><th></th></tr></thead>
         <tbody id="tbody-tasks"></tbody>
       </table>
     </div>
@@ -106,42 +113,48 @@ td { padding: 11px 13px; font-size: 13px; border-bottom: 1px solid var(--border)
   window.goTo = (id) => {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     if(id === 'home') {
-        document.getElementById('pg-home').classList.add('active');
+      document.getElementById('pg-home').classList.add('active');
+      currentPersona = "";
     } else {
-        currentPersona = id === 'mary' ? 'María Balestrini' : 'Ignacio Ríos';
-        document.getElementById('persona-titulo').innerText = "Tareas de " + (id === 'mary' ? 'Mary' : 'Nacho');
-        document.getElementById('pg-persona').classList.add('active');
+      currentPersona = id === 'mary' ? 'María Balestrini' : 'Ignacio Ríos';
+      document.getElementById('persona-titulo').innerText = "Tareas de " + (id === 'mary' ? 'Mary' : 'Nacho');
+      document.getElementById('pg-persona').classList.add('active');
     }
     render();
   };
 
   window.addTask = async () => {
-    const tarea = document.getElementById('inp-tarea').value;
+    const tarea = document.getElementById('inp-tarea').value.trim();
     const resp = document.getElementById('inp-resp').value;
-    const fecha = document.getElementById('inp-fecha').value;
-    if(!tarea || !resp) return alert("Pon nombre y responsable");
+    if(!tarea || !resp) return alert("Completa Tarea y Responsable");
 
     await addDoc(tasksRef, {
-      tarea, resp, fecha: fecha || "9999-12-31", // Fecha lejana si está vacío para que vaya al final
+      tarea, resp,
+      fecha: document.getElementById('inp-fecha').value || "9999-12-31",
       hora: document.getElementById('inp-hora').value || "",
-      desc: document.getElementById('inp-desc').value || "",
-      done: false, creadaEn: Date.now()
+      desc: document.getElementById('inp-desc').value.trim() || "",
+      done: false, creadaEn: Date.now(), open: false
     });
-    
-    // Limpiar campos
     ['inp-tarea','inp-desc','inp-fecha','inp-hora'].forEach(id => document.getElementById(id).value = "");
-  };
-
-  // Función para editar campos existentes (Fecha u Hora)
-  window.updateField = async (id, field, value) => {
-    const val = value || (field === "fecha" ? "9999-12-31" : "");
-    await updateDoc(doc(db, "tareas_equipo", id), { [field]: val });
   };
 
   window.toggle = async (id, status) => { await updateDoc(doc(db, "tareas_equipo", id), { done: !status }); };
   window.del = async (id) => { if(confirm("¿Eliminar?")) await deleteDoc(doc(db, "tareas_equipo", id)); };
+  
+  // Función para abrir/cerrar detalle (como tenías en tu código original)
+  window.toggleDetail = (id) => {
+    const row = document.getElementById('desc-' + id);
+    const btn = document.getElementById('btn-' + id);
+    if(row.style.display === 'table-row') {
+      row.style.display = 'none';
+      btn.innerText = '▾ ver detalle';
+    } else {
+      row.style.display = 'table-row';
+      btn.innerText = '▴ ocultar';
+    }
+  };
 
-  // ESCUCHAR: Ordenado por FECHA (ascendente: lo más pronto primero)
+  // Escuchar y ordenar por FECHA ASCENDENTE (Próxima entrega arriba)
   onSnapshot(query(tasksRef, orderBy("fecha", "asc")), (snap) => {
     tasks = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     render();
@@ -150,21 +163,22 @@ td { padding: 11px 13px; font-size: 13px; border-bottom: 1px solid var(--border)
   function render() {
     const tbody = document.getElementById('tbody-tasks');
     if(!tbody || !currentPersona) return;
-
     const mine = tasks.filter(t => t.resp === currentPersona);
-    
+
     tbody.innerHTML = mine.map(t => {
-      const fechaMostrada = t.fecha === "9999-12-31" ? "" : t.fecha;
+      const fDisplay = t.fecha === "9999-12-31" ? "—" : t.fecha;
       return `
       <tr>
         <td style="width:40px"><input type="checkbox" ${t.done?'checked':''} onchange="toggle('${t.id}', ${t.done})"></td>
         <td>
-            <strong>${t.tarea}</strong>
-            ${t.desc ? `<div style="font-size:11px; color:#666; margin-top:4px;">${t.desc}</div>` : ''}
+          <div class="${t.done?'done-t':''}"><strong>${t.tarea}</strong></div>
+          ${t.desc ? `<div><button id="btn-${t.id}" class="btn-expand" onclick="toggleDetail('${t.id}')">▾ ver detalle</button></div>` : ''}
         </td>
-        <td><input type="date" class="editable-input" value="${fechaMostrada}" onchange="updateField('${t.id}', 'fecha', this.value)"></td>
-        <td><input type="time" class="editable-input" value="${t.hora}" onchange="updateField('${t.id}', 'hora', this.value)"></td>
-        <td style="width:40px"><button onclick="del('${t.id}')" style="background:none; border:none; color:red; cursor:pointer">×</button></td>
+        <td style="font-family:'DM Mono', monospace; font-size:12px;">${fDisplay} ${t.hora}</td>
+        <td style="width:40px"><button onclick="del('${t.id}')" style="background:none; border:none; color:var(--text-faint); cursor:pointer; font-size:16px;">×</button></td>
+      </tr>
+      <tr class="task-desc-row" id="desc-${t.id}">
+        <td colspan="4"><div class="task-desc-content">${t.desc}</div></td>
       </tr>
     `}).join('');
   }

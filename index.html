@@ -4,100 +4,105 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tracker de Tareas</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
 <style>
-/* --- TU DISEÑO ORIGINAL IMPECABLE --- */
+/* --- DISEÑO CORREGIDO --- */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  --bg: #f7f6f3; --surface: #ffffff; --border: #e4e2dc; --border-strong: #ccc9c0;
-  --text: #1a1916; --text-muted: #7a7870; --text-faint: #b0ada5;
-  --accent: #1D9E75; --accent-bg: #e1f5ee; --accent-text: #0a5c42;
-  --radius: 8px; --radius-lg: 12px;
-  --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --bg: #f7f6f3; --surface: #ffffff; --border: #e4e2dc;
+  --text: #1a1916; --text-muted: #7a7870;
+  --accent: #1D9E75; --danger: #b92b2b;
+  --radius-lg: 12px; --shadow: 0 1px 3px rgba(0,0,0,0.06);
 }
-body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 0 0 3rem; }
-.site-header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 1.1rem 1.5rem; display: flex; align-items: center; gap: 1rem; position: sticky; top: 0; z-index: 10; box-shadow: var(--shadow); }
-.site-header h1 { font-size: 17px; font-weight: 500; flex: 1; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); padding-bottom: 3rem; }
+.site-header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 1rem 1.5rem; display: flex; align-items: center; box-shadow: var(--shadow); position: sticky; top: 0; z-index: 100; }
+.container { padding: 1.25rem; }
 
-.container { max-width: 100%; padding: 1.25rem; }
-
-/* Formulario exacto a tu imagen */
+/* Formulario */
 .form-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 1.5rem; box-shadow: var(--shadow); }
-.form-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
-.form-group { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 150px; }
-.form-group label { font-size: 11px; color: var(--text-muted); }
-.form-group input, .form-group select, .form-group textarea { font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 8px 10px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); outline: none; }
-.btn-add { background: var(--accent); color: #fff; border: none; border-radius: var(--radius); padding: 10px 24px; cursor: pointer; font-size: 14px; font-weight: 500; margin-left: auto; display: block; }
+.form-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+.form-group { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 140px; }
+.form-group label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; }
+input, select, textarea { padding: 8px; border: 1px solid var(--border); border-radius: 8px; font-family: inherit; font-size: 13px; background: var(--bg); }
+.btn-add { background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 500; align-self: flex-end; }
 
-/* Carpetas Mary y Nacho */
-.persona-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1rem 1.25rem; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 14px; box-shadow: var(--shadow); cursor: pointer; }
-.avatar { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500; }
+/* Carpetas Home */
+.folder { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 15px; margin-bottom: 10px; display: flex; align-items: center; cursor: pointer; box-shadow: var(--shadow); }
+.avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px; font-weight: 500; }
 .av-m { background: #e1f5ee; color: #0a5c42; }
 .av-i { background: #e6f1fb; color: #185fa5; }
-.pill { font-size: 11px; padding: 3px 10px; border-radius: 99px; background: #f7f6f3; color: var(--text-muted); margin-left: auto; border: 1px solid var(--border); }
 
-/* Vistas detalle */
-.page { display: none; } .page.active { display: block; }
-.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 1.25rem; }
-.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: .85rem 1rem; box-shadow: var(--shadow); }
-.stat-num { font-size: 24px; font-weight: 300; font-family: 'DM Mono', monospace; line-height: 1; }
-.table-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow); overflow: hidden; }
+/* Stats y Filtros */
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 15px; }
+.stat-card { background: var(--surface); padding: 10px; border-radius: var(--radius-lg); border: 1px solid var(--border); text-align: center; }
+.stat-num { font-family: 'DM Mono'; font-size: 20px; display: block; }
+.filters { display: flex; gap: 8px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; }
+.filter-btn { padding: 6px 15px; border-radius: 20px; border: 1px solid var(--border); background: white; cursor: pointer; font-size: 12px; }
+.filter-btn.active { background: #1a1916; color: white; border-color: #1a1916; }
+
+/* Tabla Corregida */
+.table-card { background: var(--surface); border-radius: var(--radius-lg); border: 1px solid var(--border); overflow: hidden; box-shadow: var(--shadow); }
 table { width: 100%; border-collapse: collapse; }
-th { font-size: 10px; color: var(--text-faint); text-align: left; padding: 11px 13px; text-transform: uppercase; background: var(--bg); }
-td { padding: 11px 13px; font-size: 13px; border-bottom: 1px solid var(--border); }
-.done-t { text-decoration: line-through; color: var(--text-faint); }
+th { background: var(--bg); padding: 12px; font-size: 10px; color: var(--text-muted); text-align: left; text-transform: uppercase; }
+td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 13px; vertical-align: middle; }
+.date-box { display: flex; flex-direction: column; gap: 2px; } /* Evita que se amontonen las fechas */
+.vencida { color: var(--danger); font-weight: 500; }
+.done-text { text-decoration: line-through; color: #b0ada5; }
+
+.page { display: none; }
+.page.active { display: block; }
 </style>
 </head>
 <body>
 
-<div class="page active" id="pg-home">
+<div id="pg-home" class="page active">
   <header class="site-header"><h1>Tracker de Tareas</h1></header>
   <main class="container">
     <div class="form-card">
       <div class="form-row">
         <div class="form-group" style="flex:2"><label>Tarea</label><input type="text" id="inp-tarea" placeholder="¿Qué hay que hacer?"></div>
-        <div class="form-group">
-          <label>Responsable</label>
-          <select id="inp-resp">
-            <option value="">— Seleccionar —</option>
-            <option value="Mary">Mary</option>
-            <option value="Nacho">Nacho</option>
-          </select>
+        <div class="form-group"><label>Responsable</label>
+          <select id="inp-resp"><option value="Mary">Mary</option><option value="Nacho">Nacho</option></select>
         </div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label>Fecha Entrega</label><input type="date" id="inp-fecha"></div>
+        <div class="form-group"><label>Fecha</label><input type="date" id="inp-fecha"></div>
         <div class="form-group"><label>Hora</label><input type="time" id="inp-hora"></div>
         <div class="form-group"><label>Prioridad</label>
-          <select id="inp-prio">
-            <option value="media">Media</option>
-            <option value="alta">Alta</option>
-            <option value="baja">Baja</option>
-          </select>
+          <select id="inp-prio"><option value="Media">Media</option><option value="Alta">Alta</option><option value="Baja">Baja</option></select>
         </div>
       </div>
-      <div class="form-group" style="margin-bottom:12px"><label>Detalles</label><textarea id="inp-desc" rows="2"></textarea></div>
-      <button class="btn-add" onclick="addTask()">+ Agregar</button>
+      <button class="btn-add" onclick="addTask()">+ Agregar Tarea</button>
     </div>
-    
-    <div onclick="goTo('Mary')" class="persona-card"><div class="avatar av-m">MB</div><strong>Mary</strong><span id="pill-Mary" class="pill">0 pendientes</span></div>
-    <div onclick="goTo('Nacho')" class="persona-card"><div class="avatar av-i">IR</div><strong>Nacho</strong><span id="pill-Nacho" class="pill">0 pendientes</span></div>
+    <div class="folder" onclick="openUser('Mary')"><div class="avatar av-m">MB</div><strong>Mary</strong></div>
+    <div class="folder" onclick="openUser('Nacho')"><div class="avatar av-i">IR</div><strong>Nacho</strong></div>
   </main>
 </div>
 
-<div class="page" id="pg-persona">
+<div id="pg-user" class="page">
   <header class="site-header">
-    <button onclick="goTo('home')" style="background:none; border:1px solid var(--border); padding:5px 12px; border-radius:8px; cursor:pointer; color:var(--text-muted)">← Volver</button>
-    <h1 id="p-titulo">Tareas</h1>
+    <button onclick="showHome()" style="background:none; border:none; cursor:pointer; font-size:16px; margin-right:10px">←</button>
+    <h1 id="user-title">Tareas</h1>
   </header>
   <main class="container">
     <div class="stats">
-      <div class="stat-card"><div class="stat-num" id="s-total">0</div><div class="stat-label">Total</div></div>
-      <div class="stat-card"><div class="stat-num" id="s-listas" style="color:green">0</div><div class="stat-label">Listas</div></div>
-      <div class="stat-card"><div class="stat-num" id="s-pend" style="color:orange">0</div><div class="stat-label">Pendientes</div></div>
-      <div class="stat-card"><div class="stat-num" id="s-venc" style="color:red">0</div><div class="stat-label">Vencidas</div></div>
+      <div class="stat-card"><span class="stat-num" id="s-total">0</span><small>Total</small></div>
+      <div class="stat-card"><span class="stat-num" id="s-pend" style="color:orange">0</span><small>Pend.</small></div>
+      <div class="stat-card"><span class="stat-num" id="s-done" style="color:green">0</span><small>Listas</small></div>
+      <div class="stat-card"><span class="stat-num" id="s-venc" style="color:red">0</span><small>Venc.</small></div>
     </div>
-    <div class="table-card"><table><thead><tr><th style="width:40px">✓</th><th>Tarea</th><th>Fecha</th><th>Estado</th><th style="width:40px"></th></tr></thead><tbody id="tbody-tasks"></tbody></table></div>
+    <div class="filters">
+      <button class="filter-btn active" onclick="setFilter('pendientes', this)">Pendientes</button>
+      <button class="filter-btn" onclick="setFilter('completadas', this)">Completadas</button>
+      <button class="filter-btn" onclick="setFilter('vencidas', this)">Vencidas</button>
+      <button class="filter-btn" onclick="setFilter('todas', this)">Todas</button>
+    </div>
+    <div class="table-card">
+      <table>
+        <thead><tr><th>✓</th><th>Tarea</th><th>Entrega</th><th>Estado</th><th></th></tr></thead>
+        <tbody id="task-list"></tbody>
+      </table>
+    </div>
   </main>
 </div>
 
@@ -116,55 +121,94 @@ td { padding: 11px 13px; font-size: 13px; border-bottom: 1px solid var(--border)
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
-  const tasksRef = collection(db, "tareas_equipo");
+  const colRef = collection(db, "tareas_equipo");
 
-  let tasks = [];
-  let currentID = "";
+  let allTasks = [];
+  let currentUser = "";
+  let currentFilter = "pendientes";
 
   window.addTask = async () => {
-    const t = document.getElementById('inp-tarea').value;
-    const r = document.getElementById('inp-resp').value;
-    if(!t || !r) return alert("Completa Tarea y Responsable");
-    await addDoc(tasksRef, { tarea:t, resp:r, desc: document.getElementById('inp-desc').value, fecha: document.getElementById('inp-fecha').value || "9999-12-31", hora: document.getElementById('inp-hora').value || "23:59", prio: document.getElementById('inp-prio').value, done: false, creadaEn: Date.now() });
-    alert("¡Tarea agregada!");
-    ['inp-tarea','inp-desc','inp-fecha','inp-hora'].forEach(id => document.getElementById(id).value = "");
+    const tarea = document.getElementById('inp-tarea').value;
+    if(!tarea) return alert("Escribe la tarea");
+    await addDoc(colRef, {
+      tarea, resp: document.getElementById('inp-resp').value,
+      fecha: document.getElementById('inp-fecha').value || "2099-12-31",
+      hora: document.getElementById('inp-hora').value || "--:--",
+      prio: document.getElementById('inp-prio').value,
+      done: false, creada: Date.now()
+    });
+    document.getElementById('inp-tarea').value = "";
+    alert("¡Agregada!");
   };
 
-  window.goTo = (id) => {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    if(id==='home') { document.getElementById('pg-home').classList.add('active'); currentID = ""; }
-    else { currentID = id; document.getElementById('p-titulo').innerText = "Tareas de " + id; document.getElementById('pg-persona').classList.add('active'); }
+  window.openUser = (name) => {
+    currentUser = name;
+    document.getElementById('user-title').innerText = "Tareas de " + name;
+    document.getElementById('pg-home').classList.remove('active');
+    document.getElementById('pg-user').classList.add('active');
     render();
   };
 
-  window.toggle = async (id, status) => { await updateDoc(doc(db, "tareas_equipo", id), { done: !status }); };
-  window.del = async (id) => { if(confirm("¿Eliminar?")) await deleteDoc(doc(db, "tareas_equipo", id)); };
+  window.showHome = () => {
+    document.getElementById('pg-user').classList.remove('active');
+    document.getElementById('pg-home').classList.add('active');
+  };
 
-  onSnapshot(query(tasksRef, orderBy("fecha", "asc")), (snap) => {
-    tasks = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  window.setFilter = (f, btn) => {
+    currentFilter = f;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    render();
+  };
+
+  window.toggleTask = async (id, status) => {
+    await updateDoc(doc(db, "tareas_equipo", id), { done: !status });
+  };
+
+  window.deleteTask = async (id) => {
+    if(confirm("¿Eliminar?")) await deleteDoc(doc(db, "tareas_equipo", id));
+  };
+
+  onSnapshot(query(colRef, orderBy("creada", "desc")), (snap) => {
+    allTasks = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     render();
   });
 
   function render() {
-    // Contadores en Home
-    document.getElementById('pill-Mary').innerText = tasks.filter(t=>t.resp==='Mary' && !t.done).length + " pendientes";
-    document.getElementById('pill-Nacho').innerText = tasks.filter(t=>t.resp==='Nacho' && !t.done).length + " pendientes";
+    const list = document.getElementById('task-list');
+    if(!list || !currentUser) return;
 
-    const tbody = document.getElementById('tbody-tasks');
-    if(!tbody || !currentID) return;
-    const mine = tasks.filter(t => t.resp === currentID);
     const hoy = new Date().toISOString().split('T')[0];
+    const mine = allTasks.filter(t => t.resp === currentUser);
 
+    // Actualizar Stats
     document.getElementById('s-total').innerText = mine.length;
-    document.getElementById('s-listas').innerText = mine.filter(t=>t.done).length;
-    document.getElementById('s-pend').innerText = mine.filter(t=>!t.done).length;
-    document.getElementById('s-venc').innerText = mine.filter(t=>!t.done && t.fecha < hoy && t.fecha !== "9999-12-31").length;
+    document.getElementById('s-pend').innerText = mine.filter(t => !t.done).length;
+    document.getElementById('s-done').innerText = mine.filter(t => t.done).length;
+    document.getElementById('s-venc').innerText = mine.filter(t => !t.done && t.fecha < hoy).length;
 
-    mine.sort((a,b) => (a.done === b.done) ? 0 : a.done ? 1 : -1);
+    // Aplicar Filtro de vista
+    let filtered = mine;
+    if(currentFilter === 'pendientes') filtered = mine.filter(t => !t.done);
+    if(currentFilter === 'completadas') filtered = mine.filter(t => t.done);
+    if(currentFilter === 'vencidas') filtered = mine.filter(t => !t.done && t.fecha < hoy);
 
-    tbody.innerHTML = mine.map(t => {
-      const isVencida = !t.done && t.fecha < hoy && t.fecha !== "9999-12-31";
-      return `<tr><td><input type="checkbox" ${t.done?'checked':''} onclick="toggle('${t.id}', ${t.done})"></td><td class="${t.done?'done-t':''}"><strong>${t.tarea}</strong><br><small style="color:gray">${t.desc}</small></td><td style="color:${isVencida?'red':'inherit'}">${t.fecha}<br>${t.hora}</td><td>${t.done?'LISTO':'PENDIENTE'}</td><td><button onclick="del('${t.id}')">×</button></td></tr>`;
+    list.innerHTML = filtered.map(t => {
+      const isVencida = !t.done && t.fecha < hoy;
+      return `
+        <tr>
+          <td><input type="checkbox" ${t.done?'checked':''} onclick="toggleTask('${t.id}', ${t.done})"></td>
+          <td class="${t.done?'done-text':''}"><strong>${t.tarea}</strong></td>
+          <td>
+            <div class="date-box">
+              <span class="${isVencida?'vencida':''}">${t.fecha}</span>
+              <small style="color:gray">${t.hora}</small>
+            </div>
+          </td>
+          <td>${t.done ? '✅ LISTO' : '⏳ PENDIENTE'}</td>
+          <td><button onclick="deleteTask('${t.id}')" style="background:none; border:none; cursor:pointer; color:#ccc">×</button></td>
+        </tr>
+      `;
     }).join('');
   }
 </script>

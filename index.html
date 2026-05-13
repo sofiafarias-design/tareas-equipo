@@ -6,7 +6,7 @@
 <title>Tracker de Tareas</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-/* --- TU DISEÑO ORIGINAL COMPLETO --- */
+/* --- ESTILOS ORIGINALES CONSERVADOS --- */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
   --bg: #f7f6f3; --surface: #ffffff; --border: #e4e2dc; --border-strong: #ccc9c0;
@@ -23,7 +23,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 .page.active { display: block; }
 .container { max-width: 100%; padding: 1.25rem; }
 
-/* Panel de estadísticas superior */
+/* Panel de estadísticas */
 .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1.25rem; }
 .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: .85rem 1rem; box-shadow: var(--shadow); }
 .stat-num { font-size: 24px; font-weight: 300; font-family: 'DM Mono', monospace; line-height: 1; margin-bottom: 3px; }
@@ -53,6 +53,23 @@ td { padding: 11px 13px; font-size: 13px; border-bottom: 1px solid var(--border)
 .task-desc-row { background: #fafaf8; display: none; }
 .task-desc-content { padding: 10px 14px; font-size: 12px; color: var(--text); border: 1px solid var(--border); border-radius: var(--radius); margin: 0 13px 13px; line-height: 1.4; }
 .done-t { text-decoration: line-through; color: var(--text-faint); }
+
+/* --- NUEVOS ESTILOS PARA DETALLE ORDENADO --- */
+.detail-item {
+  display: flex;
+  margin-bottom: 6px;
+  align-items: center;
+}
+.detail-label {
+  font-weight: 500;
+  color: var(--text-muted);
+  width: 80px;
+  font-size: 11px;
+}
+.detail-value {
+  color: var(--text);
+  font-size: 12px;
+}
 </style>
 </head>
 <body>
@@ -177,26 +194,25 @@ td { padding: 11px 13px; font-size: 13px; border-bottom: 1px solid var(--border)
     }
   };
 
-  // Escuchar cambios y ordenar por fecha (más próxima arriba)
   onSnapshot(query(tasksRef, orderBy("fecha", "asc")), (snap) => {
     allTasks = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     render();
   });
 
   function render() {
-    // 1. Actualizar los números de las carpetas en el Home
+    // 1. Actualizar Home
     const pMary = allTasks.filter(t => t.resp === 'María Balestrini' && !t.done).length;
     const pNacho = allTasks.filter(t => t.resp === 'Ignacio Ríos' && !t.done).length;
     if(document.getElementById('pill-mary')) document.getElementById('pill-mary').innerText = pMary + " pendientes";
     if(document.getElementById('pill-nacho')) document.getElementById('pill-nacho').innerText = pNacho + " pendientes";
 
-    // 2. Renderizar tabla de persona si estamos en esa página
+    // 2. Renderizar tabla
     const tbody = document.getElementById('tbody-tasks');
     if(!tbody || !currentPersona) return;
 
     const mine = allTasks.filter(t => t.resp === currentPersona);
 
-    // Actualizar Panel de estadísticas superior
+    // Estadísticas
     document.getElementById('stat-total').innerText = mine.length;
     document.getElementById('stat-listas').innerText = mine.filter(t => t.done).length;
     document.getElementById('stat-pend').innerText = mine.filter(t => !t.done).length;
@@ -205,7 +221,7 @@ td { padding: 11px 13px; font-size: 13px; border-bottom: 1px solid var(--border)
       const fDisplay = t.fecha === "9999-12-31" ? "Sin fecha" : t.fecha;
       return `
       <tr>
-        <td><input type="checkbox" ${t.done?'checked':''} onchange="toggle('${t.id}', ${t.done})" style="width:17px; height:17px;"></td>
+        <td><input type="checkbox" ${t.done?'checked':''} onchange="toggle('${t.id}', ${t.done})" style="width:17px; height:17px; cursor:pointer;"></td>
         <td>
           <div class="${t.done?'done-t':''}"><strong>${t.tarea}</strong></div>
           ${t.desc ? `<div><button id="btn-${t.id}" class="btn-expand" onclick="toggleDetail('${t.id}')">▾ ver detalle</button></div>` : ''}
@@ -214,7 +230,14 @@ td { padding: 11px 13px; font-size: 13px; border-bottom: 1px solid var(--border)
         <td><button onclick="del('${t.id}')" style="background:none; border:none; color:var(--text-faint); cursor:pointer; font-size:16px;">×</button></td>
       </tr>
       <tr class="task-desc-row" id="desc-${t.id}">
-        <td colspan="4"><div class="task-desc-content">${t.desc}</div></td>
+        <td colspan="4">
+          <div class="task-desc-content">
+            <div class="detail-item"><span class="detail-label">Fecha:</span><span class="detail-value">${fDisplay}</span></div>
+            <div class="detail-item"><span class="detail-label">Hora:</span><span class="detail-value">${t.hora || '—'}</span></div>
+            <div class="detail-item"><span class="detail-label">Descripción:</span></div>
+            <div style="font-size:12px; color:var(--text); margin-top:4px;">${t.desc || 'Sin descripción.'}</div>
+          </div>
+        </td>
       </tr>
     `}).join('');
   }

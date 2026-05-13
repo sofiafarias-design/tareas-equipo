@@ -41,4 +41,201 @@ th { font-size: 10px; font-weight: 500; color: var(--text-faint); text-align: le
 td { padding: 11px 13px; font-size: 13px; border-bottom: 1px solid var(--border); vertical-align: middle; }
 
 /* Badges */
-.badge { display: inline-block; font-size: 11px; font-weight: 500; padding: 2px 8px; border
+.badge { display: inline-block; font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 99px; white-space: nowrap; }
+.badge-alta { background: #faece7; color: #8a3018; }
+.badge-media { background: #faeeda; color: #7a3c08; }
+.badge-baja { background: #eaf3de; color: #2e5a0a; }
+.badge-pendiente { background: #f1efe8; color: #5f5e5a; }
+.badge-listo { background: var(--accent-bg); color: var(--accent-text); }
+.badge-vencida { background: #fcebeb; color: #7a1a1a; }
+
+.done-t { text-decoration: line-through; color: var(--text-faint); }
+.btn-expand { background: var(--accent-bg); border: none; cursor: pointer; color: var(--accent-text); font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 99px; margin-top: 5px; }
+
+/* Formulario */
+.form-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1rem; margin-bottom: 1.25rem; box-shadow: var(--shadow); }
+.form-group { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+.form-group label { font-size: 11px; color: var(--text-muted); }
+.form-group input, .form-group select, .form-group textarea { font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 7px 10px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); outline: none; }
+.form-row-top { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 8px; }
+.btn-add { background: var(--accent); color: #fff; border: none; border-radius: var(--radius); padding: 7px 18px; cursor: pointer; height: 36px; font-size: 13px; font-weight: 500; }
+</style>
+</head>
+<body>
+
+<div class="page active" id="pg-home">
+  <header class="site-header"><h1>Tracker de Tareas</h1></header>
+  <main class="container">
+    <div class="form-card">
+      <div class="form-row-top">
+        <div class="form-group" style="flex:3"><label>Título de la Tarea</label><input type="text" id="inp-tarea" placeholder="Ej: Revisar informes..."></div>
+        <div class="form-group" style="flex:2">
+          <label>Responsable</label>
+          <select id="inp-resp">
+            <option value="">— Seleccionar —</option>
+            <option value="María Balestrini">María Balestrini</option>
+            <option value="Ignacio Ríos">Ignacio Ríos</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row-top">
+        <div class="form-group"><label>Fecha de Entrega</label><input type="date" id="inp-fecha"></div>
+        <div class="form-group"><label>Hora</label><input type="time" id="inp-hora"></div>
+        <div class="form-group">
+            <label>Prioridad</label>
+            <select id="inp-prio">
+                <option value="media">Media</option>
+                <option value="alta">Alta</option>
+                <option value="baja">Baja</option>
+            </select>
+        </div>
+      </div>
+      <div style="display:flex; gap:8px; align-items: flex-end;">
+        <div class="form-group"><label>Descripción Detallada</label><textarea id="inp-desc" rows="2" placeholder="Instrucciones paso a paso..."></textarea></div>
+        <button class="btn-add" onclick="addTask()">+ Agregar</button>
+      </div>
+    </div>
+    
+    <div onclick="goTo('mary')" class="persona-card" style="cursor:pointer">
+        <div class="persona-avatar" style="background:#e1f5ee; color:#0a5c42">MB</div>
+        <div style="flex:1"><strong>Mary</strong></div>
+        <span id="pill-mary" class="badge">0 pendientes</span>
+    </div>
+    <div onclick="goTo('nacho')" class="persona-card" style="cursor:pointer">
+        <div class="persona-avatar" style="background:#e6f1fb; color:#185fa5">IR</div>
+        <div style="flex:1"><strong>Nacho</strong></div>
+        <span id="pill-nacho" class="badge">0 pendientes</span>
+    </div>
+  </main>
+</div>
+
+<div class="page" id="pg-persona">
+  <header class="site-header">
+    <button class="btn-back" onclick="goTo('home')">← Volver</button>
+    <h1 id="p-nombre-header">Tareas</h1>
+  </header>
+  <main class="container">
+    <div class="stats">
+      <div class="stat-card"><div class="stat-num" id="s-total">0</div><div class="stat-label">Total</div></div>
+      <div class="stat-card"><div class="stat-num green" id="s-listas">0</div><div class="stat-label">Listas</div></div>
+      <div class="stat-card"><div class="stat-num orange" id="s-pend">0</div><div class="stat-label">Pendientes</div></div>
+      <div class="stat-card"><div class="stat-num red" id="s-venc">0</div><div class="stat-label">Vencidas</div></div>
+    </div>
+
+    <div class="table-card">
+      <table>
+        <thead><tr><th style="width:40px">✓</th><th>Tarea</th><th>Entrega</th><th>Prioridad</th><th>Estado</th><th style="width:40px"></th></tr></thead>
+        <tbody id="tbody-tasks"></tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBJUzoXkS-x6t4sbR-RePchWSD2923x2Vg",
+    authDomain: "tareas-b31fa.firebaseapp.com",
+    projectId: "tareas-b31fa",
+    storageBucket: "tareas-b31fa.firebasestorage.app",
+    messagingSenderId: "121581147046",
+    appId: "1:121581147046:web:4d30f237e4924dcb3db567"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const tasksRef = collection(db, "tareas_equipo");
+
+  let currentPersona = "";
+  let allTasks = [];
+
+  window.goTo = (id) => {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    if(id === 'home') {
+      document.getElementById('pg-home').classList.add('active');
+      currentPersona = "";
+    } else {
+      currentPersona = id === 'mary' ? 'María Balestrini' : 'Ignacio Ríos';
+      document.getElementById('p-nombre-header').innerText = "Tareas de " + (id === 'mary' ? 'Mary' : 'Nacho');
+      document.getElementById('pg-persona').classList.add('active');
+    }
+    render();
+  };
+
+  window.addTask = async () => {
+    const tarea = document.getElementById('inp-tarea').value.trim();
+    const resp = document.getElementById('inp-resp').value;
+    if(!tarea || !resp) return alert("Completa Tarea y Responsable");
+
+    await addDoc(tasksRef, {
+      tarea, resp,
+      fecha: document.getElementById('inp-fecha').value || "9999-12-31",
+      hora: document.getElementById('inp-hora').value || "23:59",
+      prio: document.getElementById('inp-prio').value,
+      desc: document.getElementById('inp-desc').value.trim() || "",
+      done: false, creadaEn: Date.now()
+    });
+    ['inp-tarea','inp-desc','inp-fecha','inp-hora'].forEach(id => document.getElementById(id).value = "");
+  };
+
+  window.toggle = async (id, status) => { await updateDoc(doc(db, "tareas_equipo", id), { done: !status }); };
+  window.del = async (id) => { if(confirm("¿Eliminar?")) await deleteDoc(doc(db, "tareas_equipo", id)); };
+  
+  window.toggleDetail = (id) => {
+    const row = document.getElementById('desc-' + id);
+    const btn = document.getElementById('btn-' + id);
+    row.style.display = row.style.display === 'table-row' ? 'none' : 'table-row';
+    btn.innerText = row.style.display === 'table-row' ? '▴ ocultar' : '▾ ver detalle';
+  };
+
+  // ORDENAR POR FECHA Y HORA (COMO PEDISTE)
+  onSnapshot(query(tasksRef, orderBy("fecha", "asc"), orderBy("hora", "asc")), (snap) => {
+    allTasks = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    render();
+  });
+
+  function render() {
+    const pMary = allTasks.filter(t => t.resp === 'María Balestrini' && !t.done).length;
+    const pNacho = allTasks.filter(t => t.resp === 'Ignacio Ríos' && !t.done).length;
+    document.getElementById('pill-mary').innerText = pMary + " pendientes";
+    document.getElementById('pill-nacho').innerText = pNacho + " pendientes";
+
+    const tbody = document.getElementById('tbody-tasks');
+    if(!tbody || !currentPersona) return;
+
+    const hoy = new Date().toISOString().split('T')[0];
+    const mine = allTasks.filter(t => t.resp === currentPersona);
+
+    document.getElementById('s-total').innerText = mine.length;
+    document.getElementById('s-listas').innerText = mine.filter(t => t.done).length;
+    document.getElementById('s-pend').innerText = mine.filter(t => !t.done).length;
+    document.getElementById('s-venc').innerText = mine.filter(t => !t.done && t.fecha < hoy && t.fecha !== "9999-12-31").length;
+
+    tbody.innerHTML = mine.map(t => {
+      const isVencida = !t.done && t.fecha < hoy && t.fecha !== "9999-12-31";
+      const estado = t.done ? 'Listo' : (isVencida ? 'Vencida' : 'Pendiente');
+      const fDisplay = t.fecha === "9999-12-31" ? "Sin fecha" : t.fecha;
+      return `
+      <tr>
+        <td><input type="checkbox" ${t.done?'checked':''} onchange="toggle('${t.id}', ${t.done})" style="width:17px; height:17px; cursor:pointer;"></td>
+        <td>
+          <div class="${t.done?'done-t':''}"><strong>${t.tarea}</strong></div>
+          ${t.desc ? `<div><button id="btn-${t.id}" class="btn-expand" onclick="toggleDetail('${t.id}')">▾ ver detalle</button></div>` : ''}
+        </td>
+        <td style="font-family:'DM Mono', monospace; font-size:11px; color: ${isVencida ? 'red' : 'inherit'}">
+            ${fDisplay}<br>${t.hora !== "23:59" ? t.hora : ""}
+        </td>
+        <td><span class="badge badge-${t.prio}">${t.prio.toUpperCase()}</span></td>
+        <td><span class="badge badge-${estado.toLowerCase()}">${estado}</span></td>
+        <td><button onclick="del('${t.id}')" style="background:none; border:none; color:var(--text-faint); cursor:pointer; font-size:16px;">×</button></td>
+      </tr>
+      <tr id="desc-${t.id}" style="display:none; background:#fafaf8">
+        <td colspan="6"><div style="padding:15px; font-size:13px; white-space:pre-wrap; border:1px solid #eee; border-radius:8px; margin:10px">${t.desc}</div></td>
+      </tr>
+    `}).join('');
+  }
+</script>
+</body>
+</html>

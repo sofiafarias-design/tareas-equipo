@@ -6,7 +6,7 @@
 <title>Tracker de Tareas</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-/* --- TU DISEÑO ORIGINAL EXACTO --- */
+/* --- TU DISEÑO ORIGINAL IMPECABLE --- */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
   --bg: #f7f6f3; --surface: #ffffff; --border: #e4e2dc; --border-strong: #ccc9c0;
@@ -18,31 +18,155 @@
 body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 0 0 3rem; }
 .site-header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 1.1rem 1.5rem; display: flex; align-items: center; gap: 1rem; position: sticky; top: 0; z-index: 10; box-shadow: var(--shadow); }
 .site-header h1 { font-size: 17px; font-weight: 500; flex: 1; }
-.site-header .subtitle { font-size: 12px; color: var(--text-muted); font-family: 'DM Mono', monospace; }
 
 .container { max-width: 100%; padding: 1.25rem; }
 
-/* Formulario estilo imagen */
+/* Formulario exacto a tu imagen */
 .form-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 1.5rem; box-shadow: var(--shadow); }
-.form-title { font-size: 11px; font-weight: 600; color: var(--text-faint); letter-spacing: .5px; text-transform: uppercase; margin-bottom: 1rem; }
 .form-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
 .form-group { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 150px; }
-.form-group label { font-size: 11px; color: var(--text-muted); font-weight: 500; }
-.form-group input, .form-group select, .form-group textarea { font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 8px 10px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); outline: none; transition: border-color 0.2s; }
-.form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--accent); }
-.btn-add { background: var(--accent); color: #fff; border: none; border-radius: var(--radius); padding: 10px 24px; cursor: pointer; font-size: 14px; font-weight: 500; width: fit-content; margin-top: 5px; transition: opacity 0.2s; }
-.btn-add:hover { opacity: 0.9; }
+.form-group label { font-size: 11px; color: var(--text-muted); }
+.form-group input, .form-group select, .form-group textarea { font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 8px 10px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); outline: none; }
+.btn-add { background: var(--accent); color: #fff; border: none; border-radius: var(--radius); padding: 10px 24px; cursor: pointer; font-size: 14px; font-weight: 500; margin-left: auto; display: block; }
 
-/* Carpetas estilo imagen */
-.section-label { font-size: 11px; font-weight: 600; color: var(--text-faint); text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.5px; }
-.persona-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1rem 1.25rem; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 14px; box-shadow: var(--shadow); cursor: pointer; transition: transform 0.1s; }
-.persona-card:active { transform: scale(0.99); }
+/* Carpetas Mary y Nacho */
+.persona-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1rem 1.25rem; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 14px; box-shadow: var(--shadow); cursor: pointer; }
 .avatar { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500; }
 .av-m { background: #e1f5ee; color: #0a5c42; }
 .av-i { background: #e6f1fb; color: #185fa5; }
 .pill { font-size: 11px; padding: 3px 10px; border-radius: 99px; background: #f7f6f3; color: var(--text-muted); margin-left: auto; border: 1px solid var(--border); }
 
-/* Vistas de Persona */
+/* Vistas detalle */
 .page { display: none; } .page.active { display: block; }
 .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 1.25rem; }
-.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var
+.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: .85rem 1rem; box-shadow: var(--shadow); }
+.stat-num { font-size: 24px; font-weight: 300; font-family: 'DM Mono', monospace; line-height: 1; }
+.table-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow); overflow: hidden; }
+table { width: 100%; border-collapse: collapse; }
+th { font-size: 10px; color: var(--text-faint); text-align: left; padding: 11px 13px; text-transform: uppercase; background: var(--bg); }
+td { padding: 11px 13px; font-size: 13px; border-bottom: 1px solid var(--border); }
+.done-t { text-decoration: line-through; color: var(--text-faint); }
+</style>
+</head>
+<body>
+
+<div class="page active" id="pg-home">
+  <header class="site-header"><h1>Tracker de Tareas</h1></header>
+  <main class="container">
+    <div class="form-card">
+      <div class="form-row">
+        <div class="form-group" style="flex:2"><label>Tarea</label><input type="text" id="inp-tarea" placeholder="¿Qué hay que hacer?"></div>
+        <div class="form-group">
+          <label>Responsable</label>
+          <select id="inp-resp">
+            <option value="">— Seleccionar —</option>
+            <option value="Mary">Mary</option>
+            <option value="Nacho">Nacho</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Fecha Entrega</label><input type="date" id="inp-fecha"></div>
+        <div class="form-group"><label>Hora</label><input type="time" id="inp-hora"></div>
+        <div class="form-group"><label>Prioridad</label>
+          <select id="inp-prio">
+            <option value="media">Media</option>
+            <option value="alta">Alta</option>
+            <option value="baja">Baja</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:12px"><label>Detalles</label><textarea id="inp-desc" rows="2"></textarea></div>
+      <button class="btn-add" onclick="addTask()">+ Agregar</button>
+    </div>
+    
+    <div onclick="goTo('Mary')" class="persona-card"><div class="avatar av-m">MB</div><strong>Mary</strong><span id="pill-Mary" class="pill">0 pendientes</span></div>
+    <div onclick="goTo('Nacho')" class="persona-card"><div class="avatar av-i">IR</div><strong>Nacho</strong><span id="pill-Nacho" class="pill">0 pendientes</span></div>
+  </main>
+</div>
+
+<div class="page" id="pg-persona">
+  <header class="site-header">
+    <button onclick="goTo('home')" style="background:none; border:1px solid var(--border); padding:5px 12px; border-radius:8px; cursor:pointer; color:var(--text-muted)">← Volver</button>
+    <h1 id="p-titulo">Tareas</h1>
+  </header>
+  <main class="container">
+    <div class="stats">
+      <div class="stat-card"><div class="stat-num" id="s-total">0</div><div class="stat-label">Total</div></div>
+      <div class="stat-card"><div class="stat-num" id="s-listas" style="color:green">0</div><div class="stat-label">Listas</div></div>
+      <div class="stat-card"><div class="stat-num" id="s-pend" style="color:orange">0</div><div class="stat-label">Pendientes</div></div>
+      <div class="stat-card"><div class="stat-num" id="s-venc" style="color:red">0</div><div class="stat-label">Vencidas</div></div>
+    </div>
+    <div class="table-card"><table><thead><tr><th style="width:40px">✓</th><th>Tarea</th><th>Fecha</th><th>Estado</th><th style="width:40px"></th></tr></thead><tbody id="tbody-tasks"></tbody></table></div>
+  </main>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBJUzoXkS-x6t4sbR-RePchWSD2923x2Vg",
+    authDomain: "tareas-b31fa.firebaseapp.com",
+    projectId: "tareas-b31fa",
+    storageBucket: "tareas-b31fa.firebasestorage.app",
+    messagingSenderId: "121581147046",
+    appId: "1:121581147046:web:4d30f237e4924dcb3db567"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const tasksRef = collection(db, "tareas_equipo");
+
+  let tasks = [];
+  let currentID = "";
+
+  window.addTask = async () => {
+    const t = document.getElementById('inp-tarea').value;
+    const r = document.getElementById('inp-resp').value;
+    if(!t || !r) return alert("Completa Tarea y Responsable");
+    await addDoc(tasksRef, { tarea:t, resp:r, desc: document.getElementById('inp-desc').value, fecha: document.getElementById('inp-fecha').value || "9999-12-31", hora: document.getElementById('inp-hora').value || "23:59", prio: document.getElementById('inp-prio').value, done: false, creadaEn: Date.now() });
+    alert("¡Tarea agregada!");
+    ['inp-tarea','inp-desc','inp-fecha','inp-hora'].forEach(id => document.getElementById(id).value = "");
+  };
+
+  window.goTo = (id) => {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    if(id==='home') { document.getElementById('pg-home').classList.add('active'); currentID = ""; }
+    else { currentID = id; document.getElementById('p-titulo').innerText = "Tareas de " + id; document.getElementById('pg-persona').classList.add('active'); }
+    render();
+  };
+
+  window.toggle = async (id, status) => { await updateDoc(doc(db, "tareas_equipo", id), { done: !status }); };
+  window.del = async (id) => { if(confirm("¿Eliminar?")) await deleteDoc(doc(db, "tareas_equipo", id)); };
+
+  onSnapshot(query(tasksRef, orderBy("fecha", "asc")), (snap) => {
+    tasks = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    render();
+  });
+
+  function render() {
+    // Contadores en Home
+    document.getElementById('pill-Mary').innerText = tasks.filter(t=>t.resp==='Mary' && !t.done).length + " pendientes";
+    document.getElementById('pill-Nacho').innerText = tasks.filter(t=>t.resp==='Nacho' && !t.done).length + " pendientes";
+
+    const tbody = document.getElementById('tbody-tasks');
+    if(!tbody || !currentID) return;
+    const mine = tasks.filter(t => t.resp === currentID);
+    const hoy = new Date().toISOString().split('T')[0];
+
+    document.getElementById('s-total').innerText = mine.length;
+    document.getElementById('s-listas').innerText = mine.filter(t=>t.done).length;
+    document.getElementById('s-pend').innerText = mine.filter(t=>!t.done).length;
+    document.getElementById('s-venc').innerText = mine.filter(t=>!t.done && t.fecha < hoy && t.fecha !== "9999-12-31").length;
+
+    mine.sort((a,b) => (a.done === b.done) ? 0 : a.done ? 1 : -1);
+
+    tbody.innerHTML = mine.map(t => {
+      const isVencida = !t.done && t.fecha < hoy && t.fecha !== "9999-12-31";
+      return `<tr><td><input type="checkbox" ${t.done?'checked':''} onclick="toggle('${t.id}', ${t.done})"></td><td class="${t.done?'done-t':''}"><strong>${t.tarea}</strong><br><small style="color:gray">${t.desc}</small></td><td style="color:${isVencida?'red':'inherit'}">${t.fecha}<br>${t.hora}</td><td>${t.done?'LISTO':'PENDIENTE'}</td><td><button onclick="del('${t.id}')">×</button></td></tr>`;
+    }).join('');
+  }
+</script>
+</body>
+</html>

@@ -6,7 +6,7 @@
 <title>Tracker de Tareas</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-/* --- TU DISEÑO ORIGINAL IMPECABLE --- */
+/* --- TU DISEÑO ORIGINAL EXACTO --- */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
   --bg: #f7f6f3; --surface: #ffffff; --border: #e4e2dc; --border-strong: #ccc9c0;
@@ -14,144 +14,35 @@
   --accent: #1D9E75; --accent-bg: #e1f5ee; --accent-text: #0a5c42;
   --radius: 8px; --radius-lg: 12px;
   --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-  --prio-alta-bg: #faece7; --prio-alta-text: #8a3018;
-  --prio-media-bg: #faeeda; --prio-media-text: #7a3c08;
-  --prio-baja-bg: #eaf3de; --prio-baja-text: #2e5a0a;
 }
 body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 0 0 3rem; }
 .site-header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 1.1rem 1.5rem; display: flex; align-items: center; gap: 1rem; position: sticky; top: 0; z-index: 10; box-shadow: var(--shadow); }
 .site-header h1 { font-size: 17px; font-weight: 500; flex: 1; }
-.btn-back { font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text-muted); background: none; border: 1px solid var(--border); border-radius: var(--radius); padding: 5px 12px; cursor: pointer; display: flex; align-items: center; gap: 5px; }
-.page { display: none; }
-.page.active { display: block; }
+.site-header .subtitle { font-size: 12px; color: var(--text-muted); font-family: 'DM Mono', monospace; }
+
 .container { max-width: 100%; padding: 1.25rem; }
 
-/* Stats (4 cuadros) */
+/* Formulario estilo imagen */
+.form-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 1.5rem; box-shadow: var(--shadow); }
+.form-title { font-size: 11px; font-weight: 600; color: var(--text-faint); letter-spacing: .5px; text-transform: uppercase; margin-bottom: 1rem; }
+.form-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+.form-group { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 150px; }
+.form-group label { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+.form-group input, .form-group select, .form-group textarea { font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 8px 10px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); outline: none; transition: border-color 0.2s; }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--accent); }
+.btn-add { background: var(--accent); color: #fff; border: none; border-radius: var(--radius); padding: 10px 24px; cursor: pointer; font-size: 14px; font-weight: 500; width: fit-content; margin-top: 5px; transition: opacity 0.2s; }
+.btn-add:hover { opacity: 0.9; }
+
+/* Carpetas estilo imagen */
+.section-label { font-size: 11px; font-weight: 600; color: var(--text-faint); text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.5px; }
+.persona-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1rem 1.25rem; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 14px; box-shadow: var(--shadow); cursor: pointer; transition: transform 0.1s; }
+.persona-card:active { transform: scale(0.99); }
+.avatar { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500; }
+.av-m { background: #e1f5ee; color: #0a5c42; }
+.av-i { background: #e6f1fb; color: #185fa5; }
+.pill { font-size: 11px; padding: 3px 10px; border-radius: 99px; background: #f7f6f3; color: var(--text-muted); margin-left: auto; border: 1px solid var(--border); }
+
+/* Vistas de Persona */
+.page { display: none; } .page.active { display: block; }
 .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 1.25rem; }
-.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: .85rem 1rem; box-shadow: var(--shadow); }
-.stat-num { font-size: 24px; font-weight: 300; font-family: 'DM Mono', monospace; line-height: 1; margin-bottom: 3px; }
-.stat-num.green { color: var(--accent); } .stat-num.red { color: #b92b2b; }
-.stat-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; }
-
-/* Tabla */
-.table-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow); overflow: hidden; }
-table { width: 100%; border-collapse: collapse; }
-th { font-size: 10px; font-weight: 500; color: var(--text-faint); text-align: left; padding: 11px 13px; text-transform: uppercase; background: var(--bg); }
-td { padding: 11px 13px; font-size: 13px; border-bottom: 1px solid var(--border); vertical-align: middle; }
-
-/* Badges */
-.badge { display: inline-block; font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 99px; }
-.badge-alta { background: var(--prio-alta-bg); color: var(--prio-alta-text); }
-.badge-media { background: var(--prio-media-bg); color: var(--prio-media-text); }
-.badge-baja { background: var(--prio-baja-bg); color: var(--prio-baja-text); }
-.badge-listo { background: var(--accent-bg); color: var(--accent-text); }
-
-.done-t { text-decoration: line-through; color: var(--text-faint); }
-.btn-expand { background: var(--accent-bg); border: none; cursor: pointer; color: var(--accent-text); font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 99px; margin-top: 5px; }
-
-/* Home Cards */
-.persona-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1rem 1.25rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 14px; box-shadow: var(--shadow); cursor: pointer; }
-.persona-avatar { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500; }
-
-/* Formulario */
-.form-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1rem; margin-bottom: 1.25rem; box-shadow: var(--shadow); }
-.form-group { display: flex; flex-direction: column; gap: 4px; flex: 1; }
-.form-group label { font-size: 11px; color: var(--text-muted); }
-.form-group input, .form-group select, .form-group textarea { font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 7px 10px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); outline: none; }
-.btn-add { background: var(--accent); color: #fff; border: none; border-radius: var(--radius); padding: 0 20px; cursor: pointer; height: 36px; font-size: 13px; font-weight: 500; align-self: flex-end; }
-</style>
-</head>
-<body>
-
-<div class="page active" id="pg-home">
-  <header class="site-header"><h1>Tracker de Tareas</h1></header>
-  <main class="container">
-    <div class="form-card">
-      <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
-        <div class="form-group" style="flex:3"><label>Tarea</label><input type="text" id="inp-tarea" placeholder="¿Qué hay que hacer?"></div>
-        <div class="form-group" style="flex:2">
-          <label>Responsable</label>
-          <select id="inp-resp">
-            <option value="">— Seleccionar —</option>
-            <option value="mary">Mary</option>
-            <option value="nacho">Nacho</option>
-          </select>
-        </div>
-      </div>
-      <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
-        <div class="form-group"><label>Fecha Entrega</label><input type="date" id="inp-fecha"></div>
-        <div class="form-group"><label>Hora</label><input type="time" id="inp-hora"></div>
-        <div class="form-group">
-            <label>Prioridad</label>
-            <select id="inp-prio">
-                <option value="media">Media</option>
-                <option value="alta">Alta</option>
-                <option value="baja">Baja</option>
-            </select>
-        </div>
-      </div>
-      <div style="display:flex; gap:8px;">
-        <div class="form-group"><label>Detalles</label><textarea id="inp-desc" rows="2" placeholder="Escribe aquí los detalles..."></textarea></div>
-        <button class="btn-add" onclick="addTask()">+ Agregar</button>
-      </div>
-    </div>
-    
-    <div onclick="goTo('mary')" class="persona-card">
-        <div class="persona-avatar" style="background:#e1f5ee; color:#0a5c42">MB</div>
-        <div style="flex:1"><strong>Mary</strong></div>
-        <span id="pill-mary" class="badge" style="background: #f1efe8; color: #5f5e5a;">0 pendientes</span>
-    </div>
-    <div onclick="goTo('nacho')" class="persona-card">
-        <div class="persona-avatar" style="background:#e6f1fb; color:#185fa5">IR</div>
-        <div style="flex:1"><strong>Nacho</strong></div>
-        <span id="pill-nacho" class="badge" style="background: #f1efe8; color: #5f5e5a;">0 pendientes</span>
-    </div>
-  </main>
-</div>
-
-<div class="page" id="pg-persona">
-  <header class="site-header">
-    <button class="btn-back" onclick="goTo('home')">← Volver</button>
-    <h1 id="p-nombre-header">Tareas</h1>
-  </header>
-  <main class="container">
-    <div class="stats">
-      <div class="stat-card"><div class="stat-num" id="s-total">0</div><div class="stat-label">Total</div></div>
-      <div class="stat-card"><div class="stat-num green" id="s-listas">0</div><div class="stat-label">Listas</div></div>
-      <div class="stat-card"><div class="stat-num" id="s-pend" style="color:#c4620f">0</div><div class="stat-label">Pendientes</div></div>
-      <div class="stat-card"><div class="stat-num red" id="s-venc">0</div><div class="stat-label">Vencidas</div></div>
-    </div>
-
-    <div class="table-card">
-      <table>
-        <thead><tr><th style="width:40px">✓</th><th>Tarea</th><th>Entrega</th><th>Prioridad</th><th>Estado</th><th style="width:40px"></th></tr></thead>
-        <tbody id="tbody-tasks"></tbody>
-      </table>
-    </div>
-  </main>
-</div>
-
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyBJUzoXkS-x6t4sbR-RePchWSD2923x2Vg",
-    authDomain: "tareas-b31fa.firebaseapp.com",
-    projectId: "tareas-b31fa",
-    storageBucket: "tareas-b31fa.firebasestorage.app",
-    messagingSenderId: "121581147046",
-    appId: "1:121581147046:web:4d30f237e4924dcb3db567"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  const tasksRef = collection(db, "tareas_equipo");
-
-  let currentPersonaID = "";
-  let allTasks = [];
-
-  window.goTo = (id) => {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    if(id === 'home') {
-      document.getElementById
+.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var

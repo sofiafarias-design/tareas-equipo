@@ -6,12 +6,12 @@
 <title>Tracker de Tareas</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
 <style>
-/* --- DISEÑO CORREGIDO --- */
+/* --- ESTILOS FINALES --- */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
   --bg: #f7f6f3; --surface: #ffffff; --border: #e4e2dc;
   --text: #1a1916; --text-muted: #7a7870;
-  --accent: #1D9E75; --danger: #b92b2b;
+  --accent: #1D9E75; --accent-bg: #e1f5ee; --danger: #b92b2b;
   --radius-lg: 12px; --shadow: 0 1px 3px rgba(0,0,0,0.06);
 }
 body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); padding-bottom: 3rem; }
@@ -20,11 +20,12 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 
 /* Formulario */
 .form-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 1.5rem; box-shadow: var(--shadow); }
+.form-title { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; margin-bottom: 12px; }
 .form-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
 .form-group { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 140px; }
 .form-group label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; }
-input, select, textarea { padding: 8px; border: 1px solid var(--border); border-radius: 8px; font-family: inherit; font-size: 13px; background: var(--bg); }
-.btn-add { background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 500; align-self: flex-end; }
+input, select, textarea { padding: 8px; border: 1px solid var(--border); border-radius: 8px; font-family: inherit; font-size: 13px; background: var(--bg); outline: none; }
+.btn-add { background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 500; margin-top: 10px; }
 
 /* Carpetas Home */
 .folder { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 15px; margin-bottom: 10px; display: flex; align-items: center; cursor: pointer; box-shadow: var(--shadow); }
@@ -40,13 +41,14 @@ input, select, textarea { padding: 8px; border: 1px solid var(--border); border-
 .filter-btn { padding: 6px 15px; border-radius: 20px; border: 1px solid var(--border); background: white; cursor: pointer; font-size: 12px; }
 .filter-btn.active { background: #1a1916; color: white; border-color: #1a1916; }
 
-/* Tabla Corregida */
+/* Tabla */
 .table-card { background: var(--surface); border-radius: var(--radius-lg); border: 1px solid var(--border); overflow: hidden; box-shadow: var(--shadow); }
 table { width: 100%; border-collapse: collapse; }
 th { background: var(--bg); padding: 12px; font-size: 10px; color: var(--text-muted); text-align: left; text-transform: uppercase; }
-td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 13px; vertical-align: middle; }
-.date-box { display: flex; flex-direction: column; gap: 2px; } /* Evita que se amontonen las fechas */
-.vencida { color: var(--danger); font-weight: 500; }
+td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 13px; vertical-align: top; }
+.btn-expand { background: var(--accent-bg); border: none; cursor: pointer; color: var(--accent-text); font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 99px; margin-top: 5px; }
+.task-desc-row { background: #fafaf8; display: none; }
+.task-desc-content { padding: 15px; font-size: 12px; white-space: pre-wrap; line-height: 1.5; }
 .done-text { text-decoration: line-through; color: #b0ada5; }
 
 .page { display: none; }
@@ -59,8 +61,9 @@ td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 13px; ver
   <header class="site-header"><h1>Tracker de Tareas</h1></header>
   <main class="container">
     <div class="form-card">
+      <div class="form-title">NUEVA TAREA</div>
       <div class="form-row">
-        <div class="form-group" style="flex:2"><label>Tarea</label><input type="text" id="inp-tarea" placeholder="¿Qué hay que hacer?"></div>
+        <div class="form-group" style="flex:2"><label>Título</label><input type="text" id="inp-tarea" placeholder="¿Qué hay que hacer?"></div>
         <div class="form-group"><label>Responsable</label>
           <select id="inp-resp"><option value="Mary">Mary</option><option value="Nacho">Nacho</option></select>
         </div>
@@ -72,6 +75,7 @@ td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 13px; ver
           <select id="inp-prio"><option value="Media">Media</option><option value="Alta">Alta</option><option value="Baja">Baja</option></select>
         </div>
       </div>
+      <div class="form-group"><label>Descripción / Detalles</label><textarea id="inp-desc" rows="3" placeholder="Instrucciones detalladas..."></textarea></div>
       <button class="btn-add" onclick="addTask()">+ Agregar Tarea</button>
     </div>
     <div class="folder" onclick="openUser('Mary')"><div class="avatar av-m">MB</div><strong>Mary</strong></div>
@@ -99,7 +103,7 @@ td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 13px; ver
     </div>
     <div class="table-card">
       <table>
-        <thead><tr><th>✓</th><th>Tarea</th><th>Entrega</th><th>Estado</th><th></th></tr></thead>
+        <thead><tr><th style="width:40px">✓</th><th>Tarea</th><th>Entrega</th><th>Estado</th><th></th></tr></thead>
         <tbody id="task-list"></tbody>
       </table>
     </div>
@@ -135,9 +139,11 @@ td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 13px; ver
       fecha: document.getElementById('inp-fecha').value || "2099-12-31",
       hora: document.getElementById('inp-hora').value || "--:--",
       prio: document.getElementById('inp-prio').value,
+      desc: document.getElementById('inp-desc').value,
       done: false, creada: Date.now()
     });
     document.getElementById('inp-tarea').value = "";
+    document.getElementById('inp-desc').value = "";
     alert("¡Agregada!");
   };
 
@@ -169,6 +175,18 @@ td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 13px; ver
     if(confirm("¿Eliminar?")) await deleteDoc(doc(db, "tareas_equipo", id));
   };
 
+  window.toggleDetail = (id) => {
+    const row = document.getElementById('desc-' + id);
+    const btn = document.getElementById('btn-' + id);
+    if(row.style.display === 'table-row') {
+        row.style.display = 'none';
+        btn.innerText = '▾ ver detalle';
+    } else {
+        row.style.display = 'table-row';
+        btn.innerText = '▴ ocultar';
+    }
+  };
+
   onSnapshot(query(colRef, orderBy("creada", "desc")), (snap) => {
     allTasks = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     render();
@@ -181,13 +199,11 @@ td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 13px; ver
     const hoy = new Date().toISOString().split('T')[0];
     const mine = allTasks.filter(t => t.resp === currentUser);
 
-    // Actualizar Stats
     document.getElementById('s-total').innerText = mine.length;
     document.getElementById('s-pend').innerText = mine.filter(t => !t.done).length;
     document.getElementById('s-done').innerText = mine.filter(t => t.done).length;
     document.getElementById('s-venc').innerText = mine.filter(t => !t.done && t.fecha < hoy).length;
 
-    // Aplicar Filtro de vista
     let filtered = mine;
     if(currentFilter === 'pendientes') filtered = mine.filter(t => !t.done);
     if(currentFilter === 'completadas') filtered = mine.filter(t => t.done);
@@ -198,15 +214,19 @@ td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 13px; ver
       return `
         <tr>
           <td><input type="checkbox" ${t.done?'checked':''} onclick="toggleTask('${t.id}', ${t.done})"></td>
-          <td class="${t.done?'done-text':''}"><strong>${t.tarea}</strong></td>
-          <td>
-            <div class="date-box">
-              <span class="${isVencida?'vencida':''}">${t.fecha}</span>
-              <small style="color:gray">${t.hora}</small>
-            </div>
+          <td class="${t.done?'done-text':''}">
+            <strong>${t.tarea}</strong><br>
+            ${t.desc ? `<button id="btn-${t.id}" class="btn-expand" onclick="toggleDetail('${t.id}')">▾ ver detalle</button>` : ''}
+          </td>
+          <td style="font-family:monospace; font-size:11px">
+            <span class="${isVencida?'vencida':''}">${t.fecha}</span><br>
+            <span style="color:gray">${t.hora}</span>
           </td>
           <td>${t.done ? '✅ LISTO' : '⏳ PENDIENTE'}</td>
           <td><button onclick="deleteTask('${t.id}')" style="background:none; border:none; cursor:pointer; color:#ccc">×</button></td>
+        </tr>
+        <tr class="task-desc-row" id="desc-${t.id}">
+          <td colspan="5"><div class="task-desc-content">${t.desc}</div></td>
         </tr>
       `;
     }).join('');

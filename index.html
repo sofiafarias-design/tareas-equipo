@@ -6,61 +6,37 @@
 <title>Tracker de Tareas</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-/* --- ESTILOS ORIGINALES RECUPERADOS --- */
+/* --- ESTILOS --- */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  --bg: #f7f6f3; --surface: #ffffff; --border: #e4e2dc; --border-strong: #ccc9c0;
+  --bg: #f7f6f3; --surface: #ffffff; --border: #e4e2dc;
   --text: #1a1916; --text-muted: #7a7870; --text-faint: #b0ada5;
   --accent: #1D9E75; --accent-bg: #e1f5ee; --accent-text: #0a5c42;
-  --radius: 8px; --radius-lg: 12px;
-  --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-  --prio-alta-bg: #faece7; --prio-alta-text: #8a3018;
-  --prio-media-bg: #faeeda; --prio-media-text: #7a3c08;
-  --prio-baja-bg: #eaf3de; --prio-baja-text: #2e5a0a;
+  --radius-lg: 12px; --radius: 8px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.06);
 }
-body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 0 0 3rem; }
-.site-header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 1.1rem 1.5rem; display: flex; align-items: center; gap: 1rem; position: sticky; top: 0; z-index: 10; box-shadow: var(--shadow); }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); padding-bottom: 3rem; }
+.site-header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 1rem 1.5rem; display: flex; align-items: center; position: sticky; top: 0; z-index: 10; box-shadow: var(--shadow); }
 .site-header h1 { font-size: 17px; font-weight: 500; flex: 1; }
-.btn-back { font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text-muted); background: none; border: 1px solid var(--border); border-radius: var(--radius); padding: 5px 12px; cursor: pointer; display: flex; align-items: center; gap: 5px; transition: 0.2s; }
-.btn-back:hover { border-color: var(--border-strong); color: var(--text); }
-.page { display: none; }
-.page.active { display: block; }
-.container { max-width: 100%; padding: 1.25rem; }
-
-/* Panel de Stats (4 columnas como en tu imagen) */
+.btn-back { font-size: 13px; color: var(--text-muted); background: none; border: 1px solid var(--border); border-radius: var(--radius); padding: 5px 12px; cursor: pointer; margin-right: 10px; }
+.page { display: none; } .page.active { display: block; }
+.container { padding: 1.25rem; }
 .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 1.25rem; }
-.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: .85rem 1rem; box-shadow: var(--shadow); }
-.stat-num { font-size: 24px; font-weight: 300; font-family: 'DM Mono', monospace; line-height: 1; margin-bottom: 3px; }
-.stat-num.green { color: var(--accent); } .stat-num.orange { color: var(--warn); } .stat-num.red { color: #b92b2b; }
-.stat-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; }
-
-/* Tabla */
+.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: .85rem; text-align: center; box-shadow: var(--shadow); }
+.stat-num { font-size: 22px; font-family: 'DM Mono', monospace; }
+.stat-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; }
 .table-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow); overflow: hidden; }
 table { width: 100%; border-collapse: collapse; }
-th { font-size: 10px; font-weight: 500; color: var(--text-faint); text-align: left; padding: 11px 13px; text-transform: uppercase; background: var(--bg); }
-td { padding: 11px 13px; font-size: 13px; border-bottom: 1px solid var(--border); vertical-align: middle; }
-
-/* Badges */
-.badge { display: inline-block; font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 99px; }
-.badge-alta { background: var(--prio-alta-bg); color: var(--prio-alta-text); }
-.badge-media { background: var(--prio-media-bg); color: var(--prio-media-text); }
-.badge-baja { background: var(--prio-baja-bg); color: var(--prio-baja-text); }
+th { font-size: 10px; color: var(--text-faint); padding: 12px; text-align: left; background: var(--bg); text-transform: uppercase; }
+td { padding: 12px; font-size: 13px; border-bottom: 1px solid var(--border); }
+.done-t { text-decoration: line-through; color: var(--text-faint); }
+.badge { font-size: 11px; padding: 2px 8px; border-radius: 99px; font-weight: 500; }
 .badge-pendiente { background: #f1efe8; color: #5f5e5a; }
 .badge-listo { background: var(--accent-bg); color: var(--accent-text); }
-
-.done-t { text-decoration: line-through; color: var(--text-faint); }
-.btn-expand { background: var(--accent-bg); border: none; cursor: pointer; color: var(--accent-text); font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 99px; margin-top: 5px; }
-
-/* Carpetas Home */
-.persona-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1rem 1.25rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 14px; box-shadow: var(--shadow); cursor: pointer; }
-.persona-avatar { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500; }
-
-/* Formulario */
-.form-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1rem; margin-bottom: 1.25rem; box-shadow: var(--shadow); }
-.form-group { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 120px; }
-.form-group label { font-size: 11px; color: var(--text-muted); }
-.form-group input, .form-group select, .form-group textarea { font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 7px 10px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); outline: none; }
-.btn-add { background: var(--accent); color: #fff; border: none; border-radius: var(--radius); padding: 0 20px; cursor: pointer; height: 36px; font-size: 13px; font-weight: 500; align-self: flex-end; }
+.persona-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 12px; cursor: pointer; box-shadow: var(--shadow); }
+.form-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1rem; margin-bottom: 1.5rem; box-shadow: var(--shadow); }
+input, select, textarea { font-family: inherit; font-size: 13px; padding: 7px; border: 1px solid var(--border); border-radius: var(--radius); width: 100%; background: var(--bg); }
+.btn-add { background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: var(--radius); cursor: pointer; font-weight: 500; margin-top: 10px; }
 </style>
 </head>
 <body>
@@ -69,64 +45,30 @@ td { padding: 11px 13px; font-size: 13px; border-bottom: 1px solid var(--border)
   <header class="site-header"><h1>Tracker de Tareas</h1></header>
   <main class="container">
     <div class="form-card">
-      <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
-        <div class="form-group" style="flex:3"><label>Tarea</label><input type="text" id="inp-tarea" placeholder="¿Qué hay que hacer?"></div>
-        <div class="form-group" style="flex:2">
-          <label>Responsable</label>
-          <select id="inp-resp">
-            <option value="">— Seleccionar —</option>
-            <option value="mary">Mary</option>
-            <option value="nacho">Nacho</option>
-          </select>
-        </div>
+      <input type="text" id="inp-tarea" placeholder="Título de la tarea" style="margin-bottom:8px">
+      <div style="display:flex; gap:8px; margin-bottom:8px">
+        <select id="inp-resp"><option value="">Asignar a...</option><option value="mary">Mary</option><option value="nacho">Nacho</option></select>
+        <input type="date" id="inp-fecha">
       </div>
-      <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
-        <div class="form-group"><label>Fecha Entrega</label><input type="date" id="inp-fecha"></div>
-        <div class="form-group"><label>Hora</label><input type="time" id="inp-hora"></div>
-        <div class="form-group">
-            <label>Prioridad</label>
-            <select id="inp-prio">
-                <option value="media">Media</option>
-                <option value="alta">Alta</option>
-                <option value="baja">Baja</option>
-            </select>
-        </div>
-      </div>
-      <div style="display:flex; gap:8px;">
-        <div class="form-group"><label>Descripción / Detalles</label><textarea id="inp-desc" rows="2" placeholder="Escribe aquí los detalles..."></textarea></div>
-        <button class="btn-add" onclick="addTask()">+ Agregar</button>
-      </div>
+      <textarea id="inp-desc" placeholder="Detalles o instrucciones..."></textarea>
+      <button class="btn-add" onclick="addTask()">+ Crear Tarea</button>
     </div>
-    
-    <div onclick="goTo('mary')" class="persona-card">
-        <div class="persona-avatar" style="background:#e1f5ee; color:#0a5c42">MB</div>
-        <div style="flex:1"><strong>Mary</strong></div>
-        <span id="pill-mary" class="badge badge-pendiente">0 pendientes</span>
-    </div>
-    <div onclick="goTo('nacho')" class="persona-card">
-        <div class="persona-avatar" style="background:#e6f1fb; color:#185fa5">IR</div>
-        <div style="flex:1"><strong>Nacho</strong></div>
-        <span id="pill-nacho" class="badge badge-pendiente">0 pendientes</span>
-    </div>
+    <div onclick="goTo('mary')" class="persona-card"><strong>Mary</strong> <span id="pill-mary" class="badge badge-pendiente">0</span></div>
+    <div onclick="goTo('nacho')" class="persona-card"><strong>Nacho</strong> <span id="pill-nacho" class="badge badge-pendiente">0</span></div>
   </main>
 </div>
 
 <div class="page" id="pg-persona">
-  <header class="site-header">
-    <button class="btn-back" onclick="goTo('home')">← Volver</button>
-    <h1 id="p-nombre-header">Tareas de Mary</h1>
-  </header>
+  <header class="site-header"><button class="btn-back" onclick="goTo('home')">←</button><h1 id="p-titulo">Tareas</h1></header>
   <main class="container">
     <div class="stats">
       <div class="stat-card"><div class="stat-num" id="s-total">0</div><div class="stat-label">Total</div></div>
-      <div class="stat-card"><div class="stat-num green" id="s-listas">0</div><div class="stat-label">Listas</div></div>
-      <div class="stat-card"><div class="stat-num" id="s-pend" style="color:#c4620f">0</div><div class="stat-label">Pendientes</div></div>
-      <div class="stat-card"><div class="stat-num red" id="s-venc">0</div><div class="stat-label">Vencidas</div></div>
+      <div class="stat-card"><div class="stat-num" id="s-listas" style="color:green">0</div><div class="stat-label">Listas</div></div>
+      <div class="stat-card"><div class="stat-num" id="s-pend" style="color:orange">0</div><div class="stat-label">Pendientes</div></div>
     </div>
-
     <div class="table-card">
       <table>
-        <thead><tr><th style="width:40px">✓</th><th>Tarea</th><th>Entrega</th><th>Prioridad</th><th>Estado</th><th style="width:40px"></th></tr></thead>
+        <thead><tr><th style="width:40px">Status</th><th>Tarea</th><th>Estado</th></tr></thead>
         <tbody id="tbody-tasks"></tbody>
       </table>
     </div>
@@ -150,95 +92,41 @@ td { padding: 11px 13px; font-size: 13px; border-bottom: 1px solid var(--border)
   const db = getFirestore(app);
   const tasksRef = collection(db, "tareas_equipo");
 
-  let currentPersonaID = ""; // "mary" o "nacho"
-  let allTasks = [];
+  let tasks = [];
+  let currentID = "";
 
   window.goTo = (id) => {
+    currentID = id;
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    if(id === 'home') {
-      document.getElementById('pg-home').classList.add('active');
-      currentPersonaID = "";
-    } else {
-      currentPersonaID = id;
-      document.getElementById('p-nombre-header').innerText = "Tareas de " + (id === 'mary' ? 'Mary' : 'Nacho');
-      document.getElementById('pg-persona').classList.add('active');
+    if(id==='home') document.getElementById('pg-home').classList.add('active');
+    else {
+        document.getElementById('p-titulo').innerText = "Tareas de " + id;
+        document.getElementById('pg-persona').classList.add('active');
     }
     render();
   };
 
   window.addTask = async () => {
-    const tarea = document.getElementById('inp-tarea').value.trim();
-    const resp = document.getElementById('inp-resp').value;
-    if(!tarea || !resp) return alert("Completa Tarea y Responsable");
-
-    await addDoc(tasksRef, {
-      tarea, resp, // Guardamos el ID simplificado: "mary" o "nacho"
-      fecha: document.getElementById('inp-fecha').value || "9999-12-31",
-      hora: document.getElementById('inp-hora').value || "23:59",
-      prio: document.getElementById('inp-prio').value,
-      desc: document.getElementById('inp-desc').value.trim() || "",
-      done: false, 
-      creadaEn: Date.now()
-    });
-    
-    alert("¡Tarea guardada!");
-    ['inp-tarea','inp-desc','inp-fecha','inp-hora'].forEach(id => document.getElementById(id).value = "");
-    document.getElementById('inp-resp').value = "";
+    const t = document.getElementById('inp-tarea').value;
+    const r = document.getElementById('inp-resp').value;
+    if(!t || !r) return alert("Falta tarea o responsable");
+    await addDoc(tasksRef, { tarea:t, resp:r, desc: document.getElementById('inp-desc').value, fecha: document.getElementById('inp-fecha').value, done: false, creadaEn: Date.now() });
+    alert("Tarea enviada");
+    document.getElementById('inp-tarea').value = "";
   };
 
-  window.toggle = async (id, status) => { await updateDoc(doc(db, "tareas_equipo", id), { done: !status }); };
-  window.del = async (id) => { if(confirm("¿Eliminar?")) await deleteDoc(doc(db, "tareas_equipo", id)); };
-  
-  window.toggleDetail = (id) => {
-    const row = document.getElementById('desc-' + id);
-    row.style.display = row.style.display === 'table-row' ? 'none' : 'table-row';
+  // ESTA ES LA FUNCIÓN QUE LES PERMITE MARCAR COMO LISTA
+  window.toggleTask = async (id, currentStatus) => {
+    const taskDoc = doc(db, "tareas_equipo", id);
+    await updateDoc(taskDoc, { done: !currentStatus });
   };
 
-  onSnapshot(query(tasksRef, orderBy("fecha", "asc")), (snap) => {
-    allTasks = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  onSnapshot(query(tasksRef, orderBy("creadaEn", "desc")), (snap) => {
+    tasks = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     render();
   });
 
   function render() {
-    // 1. Contadores en el Home
-    const pMary = allTasks.filter(t => t.resp === 'mary' && !t.done).length;
-    const pNacho = allTasks.filter(t => t.resp === 'nacho' && !t.done).length;
-    document.getElementById('pill-mary').innerText = pMary + " pendientes";
-    document.getElementById('pill-nacho').innerText = pNacho + " pendientes";
-
-    // 2. Tabla de persona
-    const tbody = document.getElementById('tbody-tasks');
-    if(!tbody || !currentPersonaID) return;
-
-    const mine = allTasks.filter(t => t.resp === currentPersonaID);
-    const hoy = new Date().toISOString().split('T')[0];
-
-    document.getElementById('s-total').innerText = mine.length;
-    document.getElementById('s-listas').innerText = mine.filter(t => t.done).length;
-    document.getElementById('s-pend').innerText = mine.filter(t => !t.done).length;
-    document.getElementById('s-venc').innerText = mine.filter(t => !t.done && t.fecha < hoy && t.fecha !== "9999-12-31").length;
-
-    tbody.innerHTML = mine.map(t => {
-      const isVencida = !t.done && t.fecha < hoy && t.fecha !== "9999-12-31";
-      const estado = t.done ? 'Listo' : (isVencida ? 'Vencida' : 'Pendiente');
-      const fDisplay = t.fecha === "9999-12-31" ? "—" : t.fecha;
-      return `
-      <tr>
-        <td><input type="checkbox" ${t.done?'checked':''} onchange="toggle('${t.id}', ${t.done})" style="width:17px; height:17px; cursor:pointer;"></td>
-        <td>
-          <div class="${t.done?'done-t':''}"><strong>${t.tarea}</strong></div>
-          ${t.desc ? `<div><button class="btn-expand" onclick="toggleDetail('${t.id}')">▾ ver detalle</button></div>` : ''}
-        </td>
-        <td style="font-family:'DM Mono', monospace; font-size:11px;">${fDisplay}<br>${t.hora}</td>
-        <td><span class="badge badge-${t.prio}">${t.prio.toUpperCase()}</span></td>
-        <td><span class="badge badge-${estado.toLowerCase()}">${estado}</span></td>
-        <td><button onclick="del('${t.id}')" style="background:none; border:none; color:var(--text-faint); cursor:pointer;">×</button></td>
-      </tr>
-      <tr id="desc-${t.id}" style="display:none; background:#fafaf8">
-        <td colspan="6"><div style="padding:15px; font-size:12px; white-space:pre-wrap; line-height:1.5;">${t.desc}</div></td>
-      </tr>
-    `}).join('');
-  }
-</script>
-</body>
-</html>
+    // Actualizar Home
+    document.getElementById('pill-mary').innerText = tasks.filter(t=>t.resp==='mary' && !t.done).length;
+    document.getElementById('pill-nacho').innerText = tasks.

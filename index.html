@@ -19,24 +19,32 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 .site-header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 1rem 1.5rem; display: flex; align-items: center; position: sticky; top: 0; z-index: 10; box-shadow: var(--shadow); }
 .site-header h1 { font-size: 17px; font-weight: 500; flex: 1; }
 .btn-back { font-size: 13px; color: var(--text-muted); background: none; border: 1px solid var(--border); border-radius: var(--radius); padding: 5px 12px; cursor: pointer; margin-right: 10px; }
+
 .page { display: none; } .page.active { display: block; }
 .container { padding: 1.25rem; }
-.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 1.25rem; }
+
+/* Stats */
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1.25rem; }
 .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: .85rem; text-align: center; box-shadow: var(--shadow); }
 .stat-num { font-size: 22px; font-family: 'DM Mono', monospace; }
-.stat-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; }
-.table-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow); overflow: hidden; }
+
+/* Secciones de Listas */
+.section-title { font-size: 12px; font-weight: 600; text-transform: uppercase; color: var(--text-muted); margin: 20px 0 10px 5px; display: flex; align-items: center; gap: 8px; }
+.count-badge { background: var(--border); color: var(--text-muted); padding: 2px 6px; border-radius: 4px; font-size: 10px; }
+
+.table-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow); overflow: hidden; margin-bottom: 20px; }
 table { width: 100%; border-collapse: collapse; }
-th { font-size: 10px; color: var(--text-faint); padding: 12px; text-align: left; background: var(--bg); text-transform: uppercase; }
+th { font-size: 10px; color: var(--text-faint); padding: 10px; text-align: left; background: #fafafa; text-transform: uppercase; }
 td { padding: 12px; font-size: 13px; border-bottom: 1px solid var(--border); }
+
 .done-t { text-decoration: line-through; color: var(--text-faint); }
-.badge { font-size: 11px; padding: 2px 8px; border-radius: 99px; font-weight: 500; }
-.badge-pendiente { background: #f1efe8; color: #5f5e5a; }
-.badge-listo { background: var(--accent-bg); color: var(--accent-text); }
+.badge { font-size: 10px; padding: 2px 8px; border-radius: 99px; font-weight: 500; }
+.badge-vencida { background: #fcebeb; color: #b92b2b; }
+
 .persona-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 12px; cursor: pointer; box-shadow: var(--shadow); }
 .form-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1rem; margin-bottom: 1.5rem; box-shadow: var(--shadow); }
-input, select, textarea { font-family: inherit; font-size: 13px; padding: 7px; border: 1px solid var(--border); border-radius: var(--radius); width: 100%; background: var(--bg); }
-.btn-add { background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: var(--radius); cursor: pointer; font-weight: 500; margin-top: 10px; }
+input, select, textarea { font-family: inherit; font-size: 13px; padding: 7px; border: 1px solid var(--border); border-radius: var(--radius); width: 100%; background: var(--bg); margin-bottom: 8px; outline: none; }
+.btn-add { background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: var(--radius); cursor: pointer; font-weight: 500; width: 100%; }
 </style>
 </head>
 <body>
@@ -45,33 +53,46 @@ input, select, textarea { font-family: inherit; font-size: 13px; padding: 7px; b
   <header class="site-header"><h1>Tracker de Tareas</h1></header>
   <main class="container">
     <div class="form-card">
-      <input type="text" id="inp-tarea" placeholder="Título de la tarea" style="margin-bottom:8px">
-      <div style="display:flex; gap:8px; margin-bottom:8px">
-        <select id="inp-resp"><option value="">Asignar a...</option><option value="mary">Mary</option><option value="nacho">Nacho</option></select>
+      <input type="text" id="inp-tarea" placeholder="¿Qué tarea hay que hacer?">
+      <div style="display:flex; gap:8px;">
+        <select id="inp-resp"><option value="">Responsable...</option><option value="mary">Mary</option><option value="nacho">Nacho</option></select>
         <input type="date" id="inp-fecha">
       </div>
-      <textarea id="inp-desc" placeholder="Detalles o instrucciones..."></textarea>
-      <button class="btn-add" onclick="addTask()">+ Crear Tarea</button>
+      <textarea id="inp-desc" placeholder="Instrucciones detalladas..."></textarea>
+      <button class="btn-add" onclick="addTask()">+ Asignar Tarea</button>
     </div>
-    <div onclick="goTo('mary')" class="persona-card"><strong>Mary</strong> <span id="pill-mary" class="badge badge-pendiente">0</span></div>
-    <div onclick="goTo('nacho')" class="persona-card"><strong>Nacho</strong> <span id="pill-nacho" class="badge badge-pendiente">0</span></div>
+    
+    <div onclick="goTo('mary')" class="persona-card"><strong>Mary</strong> <span id="pill-mary" class="badge" style="background:#e1f5ee">0 pendientes</span></div>
+    <div onclick="goTo('nacho')" class="persona-card"><strong>Nacho</strong> <span id="pill-nacho" class="badge" style="background:#e1f5ee">0 pendientes</span></div>
   </main>
 </div>
 
 <div class="page" id="pg-persona">
-  <header class="site-header"><button class="btn-back" onclick="goTo('home')">←</button><h1 id="p-titulo">Tareas</h1></header>
+  <header class="site-header"><button class="btn-back" onclick="goTo('home')">← Volver</button><h1 id="p-titulo">Tareas</h1></header>
   <main class="container">
+    
     <div class="stats">
-      <div class="stat-card"><div class="stat-num" id="s-total">0</div><div class="stat-label">Total</div></div>
-      <div class="stat-card"><div class="stat-num" id="s-listas" style="color:green">0</div><div class="stat-label">Listas</div></div>
       <div class="stat-card"><div class="stat-num" id="s-pend" style="color:orange">0</div><div class="stat-label">Pendientes</div></div>
+      <div class="stat-card"><div class="stat-num" id="s-venc" style="color:red">0</div><div class="stat-label">Vencidas</div></div>
+      <div class="stat-card"><div class="stat-num" id="s-listas" style="color:green">0</div><div class="stat-label">Listas</div></div>
     </div>
+
+    <div class="section-title">⏳ Pendientes <span id="c-pend" class="count-badge">0</span></div>
     <div class="table-card">
-      <table>
-        <thead><tr><th style="width:40px">Status</th><th>Tarea</th><th>Estado</th></tr></thead>
-        <tbody id="tbody-tasks"></tbody>
-      </table>
+        <table><thead><tr><th style="width:40px"></th><th>Tarea</th><th>Fecha</th></tr></thead>
+        <tbody id="list-pend"></tbody></table>
     </div>
+
+    <div class="section-title" style="color:#b92b2b">⚠️ Vencidas <span id="c-venc" class="count-badge" style="background:#fcebeb; color:#b92b2b">0</span></div>
+    <div class="table-card">
+        <table><tbody id="list-venc"></tbody></table>
+    </div>
+
+    <div class="section-title">✅ Completadas <span id="c-listas" class="count-badge">0</span></div>
+    <div class="table-card">
+        <table><tbody id="list-listas"></tbody></table>
+    </div>
+
   </main>
 </div>
 
@@ -92,7 +113,7 @@ input, select, textarea { font-family: inherit; font-size: 13px; padding: 7px; b
   const db = getFirestore(app);
   const tasksRef = collection(db, "tareas_equipo");
 
-  let tasks = [];
+  let allTasks = [];
   let currentID = "";
 
   window.goTo = (id) => {
@@ -100,7 +121,7 @@ input, select, textarea { font-family: inherit; font-size: 13px; padding: 7px; b
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     if(id==='home') document.getElementById('pg-home').classList.add('active');
     else {
-        document.getElementById('p-titulo').innerText = "Tareas de " + id;
+        document.getElementById('p-titulo').innerText = "Tareas de " + id.toUpperCase();
         document.getElementById('pg-persona').classList.add('active');
     }
     render();
@@ -110,23 +131,61 @@ input, select, textarea { font-family: inherit; font-size: 13px; padding: 7px; b
     const t = document.getElementById('inp-tarea').value;
     const r = document.getElementById('inp-resp').value;
     if(!t || !r) return alert("Falta tarea o responsable");
-    await addDoc(tasksRef, { tarea:t, resp:r, desc: document.getElementById('inp-desc').value, fecha: document.getElementById('inp-fecha').value, done: false, creadaEn: Date.now() });
-    alert("Tarea enviada");
+    await addDoc(tasksRef, { 
+        tarea: t, resp: r, 
+        desc: document.getElementById('inp-desc').value, 
+        fecha: document.getElementById('inp-fecha').value || "9999-12-31", 
+        done: false, creadaEn: Date.now() 
+    });
+    alert("Tarea asignada");
     document.getElementById('inp-tarea').value = "";
+    document.getElementById('inp-desc').value = "";
   };
 
-  // ESTA ES LA FUNCIÓN QUE LES PERMITE MARCAR COMO LISTA
-  window.toggleTask = async (id, currentStatus) => {
-    const taskDoc = doc(db, "tareas_equipo", id);
-    await updateDoc(taskDoc, { done: !currentStatus });
+  window.toggleTask = async (id, status) => {
+    await updateDoc(doc(db, "tareas_equipo", id), { done: !status });
   };
 
-  onSnapshot(query(tasksRef, orderBy("creadaEn", "desc")), (snap) => {
-    tasks = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  onSnapshot(query(tasksRef, orderBy("fecha", "asc")), (snap) => {
+    allTasks = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     render();
   });
 
   function render() {
-    // Actualizar Home
-    document.getElementById('pill-mary').innerText = tasks.filter(t=>t.resp==='mary' && !t.done).length;
-    document.getElementById('pill-nacho').innerText = tasks.
+    // Pill de Home
+    document.getElementById('pill-mary').innerText = allTasks.filter(t=>t.resp==='mary' && !t.done).length + " pendientes";
+    document.getElementById('pill-nacho').innerText = allTasks.filter(t=>t.resp==='nacho' && !t.done).length + " pendientes";
+
+    if(!currentID || currentID==='home') return;
+
+    const hoy = new Date().toISOString().split('T')[0];
+    const mine = allTasks.filter(t => t.resp === currentID);
+
+    // Clasificar tareas
+    const pendientes = mine.filter(t => !t.done && (t.fecha >= hoy || t.fecha === "9999-12-31"));
+    const vencidas = mine.filter(t => !t.done && t.fecha < hoy && t.fecha !== "9999-12-31");
+    const completadas = mine.filter(t => t.done);
+
+    // Actualizar Stats y Contadores
+    document.getElementById('s-pend').innerText = pendientes.length;
+    document.getElementById('c-pend').innerText = pendientes.length;
+    document.getElementById('s-venc').innerText = vencidas.length;
+    document.getElementById('c-venc').innerText = vencidas.length;
+    document.getElementById('s-listas').innerText = completadas.length;
+    document.getElementById('c-listas').innerText = completadas.length;
+
+    // Renderizar Tablas
+    const drawRow = (t) => `
+      <tr>
+        <td style="width:40px"><input type="checkbox" ${t.done?'checked':''} onclick="toggleTask('${t.id}', ${t.done})" style="width:18px; height:18px;"></td>
+        <td class="${t.done?'done-t':''}"><strong>${t.tarea}</strong><br><small style="color:gray">${t.desc}</small></td>
+        <td style="font-family:monospace; font-size:11px; white-space:nowrap">${t.fecha==='9999-12-31'?'—':t.fecha}</td>
+      </tr>`;
+
+    document.getElementById('list-pend').innerHTML = pendientes.map(drawRow).join('');
+    document.getElementById('list-venc').innerHTML = vencidas.map(drawRow).join('');
+    document.getElementById('list-listas').innerHTML = completadas.map(drawRow).join('');
+  }
+</script>
+</body>
+</html>

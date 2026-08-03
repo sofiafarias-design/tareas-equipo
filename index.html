@@ -22,7 +22,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 .site-header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 1.1rem 1.5rem; display: flex; align-items: center; gap: 1rem; position: sticky; top: 0; z-index: 10; box-shadow: var(--shadow); }
 .site-header h1 { font-size: 17px; font-weight: 500; flex: 1; }
 .site-header .subtitle { font-size: 12px; color: var(--text-muted); font-family: 'DM Mono', monospace; }
-.btn-back { font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text-muted); background: none; border: 1px solid var(--border); border-radius: var(--radius); padding: 5px 12px; cursor: pointer; display: flex; align-items: center; gap: 5px; transition: all .15s; white-space: nowrap; }
+.btn-back { font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text-muted); background: none; border: 1px solid var(--border); border-radius: var(--radius); padding: 5px 12px; cursor: pointer; transition: all .15s; white-space: nowrap; }
 .btn-back:hover { border-color: var(--border-strong); color: var(--text); }
 .page { display: none; }
 .page.active { display: block; }
@@ -83,7 +83,7 @@ input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent);
 .task-name:focus { outline: 1px solid var(--accent); background: var(--bg); }
 .task-name.done-t { text-decoration: line-through; color: var(--text-faint); }
 .task-desc { font-size: 13px; color: var(--text); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; line-height: 1.7; white-space: pre-wrap; word-break: break-word; box-shadow: var(--shadow); }
-.btn-expand { display: inline-block; background: var(--accent-bg); border: none; cursor: pointer; color: var(--accent-text); font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 99px; margin-top: 5px; white-space: nowrap; letter-spacing: 0.2px; transition: background .15s; }
+.btn-expand { display: inline-block; background: var(--accent-bg); border: none; cursor: pointer; color: var(--accent-text); font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 99px; margin-top: 5px; white-space: nowrap; transition: background .15s; }
 .btn-expand:hover { background: #c5ead9; }
 .fecha-cell { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--text); font-weight: 500; }
 .fecha-cell .hora { font-size: 11px; color: var(--text-muted); font-weight: 400; display: block; margin-top: 1px; }
@@ -97,7 +97,13 @@ input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent);
 .badge-vencida { background: var(--danger-bg); color: var(--danger-text); }
 .btn-del { background: none; border: none; cursor: pointer; color: var(--text-faint); font-size: 17px; line-height: 1; padding: 3px 6px; border-radius: var(--radius); transition: color .15s, background .15s; }
 .btn-del:hover { color: var(--danger); background: var(--danger-bg); }
+.drag-handle { cursor: grab; color: var(--text-faint); font-size: 16px; padding: 0 6px; user-select: none; }
+.drag-handle:active { cursor: grabbing; }
+tr.dragging { opacity: 0.4; background: var(--accent-bg) !important; }
+tr.drag-over { border-top: 2px solid var(--accent); }
 .empty-state { text-align: center; padding: 2.5rem; color: var(--text-faint); font-size: 13px; }
+.status-bar { font-size: 12px; color: var(--text-muted); text-align: center; padding: 8px; background: var(--accent-bg); display: none; }
+.status-bar.show { display: block; }
 </style>
 </head>
 <body>
@@ -109,6 +115,7 @@ input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent);
     <span class="subtitle">seguimiento del equipo</span>
   </header>
   <main class="container">
+    <div id="status-bar" class="status-bar">Conectando con Firebase...</div>
     <div class="form-card">
       <div class="form-title">Nueva tarea</div>
       <div class="form-row-top">
@@ -132,11 +139,11 @@ input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent);
       </div>
       <div class="form-row-bottom">
         <div class="form-group desc"><label>Descripción / detalles</label><textarea id="inp-desc" placeholder="Instrucciones, contexto, detalles..."></textarea></div>
-        <button class="btn-add" onclick="addTask()">+ Agregar</button>
+        <button class="btn-add" id="btn-agregar">+ Agregar</button>
       </div>
     </div>
     <div class="folders-title">Tareas por persona</div>
-    <div class="folder" onclick="goTo('mary')">
+    <div class="folder" id="folder-mary">
       <div class="folder-header">
         <div class="avatar av-m">MB</div>
         <span class="folder-name">Mary</span>
@@ -147,7 +154,7 @@ input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent);
         </div>
       </div>
     </div>
-    <div class="folder" onclick="goTo('nacho')">
+    <div class="folder" id="folder-nacho">
       <div class="folder-header">
         <div class="avatar av-i">IR</div>
         <span class="folder-name">Nacho</span>
@@ -164,7 +171,7 @@ input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent);
 <!-- MARY -->
 <div class="page" id="pg-mary">
   <header class="site-header">
-    <button class="btn-back" onclick="goTo('home')">← Volver</button>
+    <button class="btn-back" id="back-mary">← Volver</button>
     <h1>Tracker de Tareas</h1>
   </header>
   <main class="container">
@@ -179,17 +186,17 @@ input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent);
       <div class="stat-card"><div class="stat-num red" id="mary-venc">0</div><div class="stat-label">Vencidas</div></div>
     </div>
     <div class="top-bar">
-      <div class="filters">
-        <button class="filter-btn active" onclick="setFilter('mary','pendientes',this)">Pendientes</button>
-        <button class="filter-btn" onclick="setFilter('mary','todas',this)">Todas</button>
-        <button class="filter-btn" onclick="setFilter('mary','listas',this)">Completadas</button>
-        <button class="filter-btn" onclick="setFilter('mary','vencidas',this)">Vencidas</button>
+      <div class="filters" id="filters-mary">
+        <button class="filter-btn active" data-f="pendientes">Pendientes</button>
+        <button class="filter-btn" data-f="todas">Todas</button>
+        <button class="filter-btn" data-f="listas">Completadas</button>
+        <button class="filter-btn" data-f="vencidas">Vencidas</button>
       </div>
-      <button class="btn-export" onclick="exportCSV('María Balestrini')">Exportar CSV ↓</button>
+      <button class="btn-export" id="export-mary">Exportar CSV ↓</button>
     </div>
     <div class="table-card"><div class="table-wrap">
-      <table><colgroup><col class="ck"><col class="ct"><col class="cf"><col class="cp"><col class="ce"><col class="ca"></colgroup>
-      <thead><tr><th class="center">✓</th><th>Tarea</th><th>Entrega</th><th>Prioridad</th><th>Estado</th><th></th></tr></thead>
+      <table><colgroup><col style="width:32px"><col class="ck"><col class="ct"><col class="cf"><col class="cp"><col class="ce"><col class="ca"></colgroup>
+      <thead><tr><th></th><th class="center">✓</th><th>Tarea</th><th>Entrega</th><th>Prioridad</th><th>Estado</th><th></th></tr></thead>
       <tbody id="tbody-mary"></tbody></table>
       <div class="empty-state" id="empty-mary" style="display:none">No hay tareas en esta vista.</div>
     </div></div>
@@ -199,10 +206,11 @@ input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent);
 <!-- NACHO -->
 <div class="page" id="pg-nacho">
   <header class="site-header">
-    <button class="btn-back" onclick="goTo('home')">← Volver</button>
+    <button class="btn-back" id="back-nacho">← Volver</button>
     <h1>Tracker de Tareas</h1>
   </header>
   <main class="container">
+    <div class="persona-avatar av-i">IR</div>
     <div class="persona-header">
       <div class="persona-avatar av-i">IR</div>
       <div><div class="persona-name">Nacho</div><div class="persona-sub" id="nacho-sub">—</div></div>
@@ -214,17 +222,17 @@ input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent);
       <div class="stat-card"><div class="stat-num red" id="nacho-venc">0</div><div class="stat-label">Vencidas</div></div>
     </div>
     <div class="top-bar">
-      <div class="filters">
-        <button class="filter-btn active" onclick="setFilter('nacho','pendientes',this)">Pendientes</button>
-        <button class="filter-btn" onclick="setFilter('nacho','todas',this)">Todas</button>
-        <button class="filter-btn" onclick="setFilter('nacho','listas',this)">Completadas</button>
-        <button class="filter-btn" onclick="setFilter('nacho','vencidas',this)">Vencidas</button>
+      <div class="filters" id="filters-nacho">
+        <button class="filter-btn active" data-f="pendientes">Pendientes</button>
+        <button class="filter-btn" data-f="todas">Todas</button>
+        <button class="filter-btn" data-f="listas">Completadas</button>
+        <button class="filter-btn" data-f="vencidas">Vencidas</button>
       </div>
-      <button class="btn-export" onclick="exportCSV('Ignacio Ríos')">Exportar CSV ↓</button>
+      <button class="btn-export" id="export-nacho">Exportar CSV ↓</button>
     </div>
     <div class="table-card"><div class="table-wrap">
-      <table><colgroup><col class="ck"><col class="ct"><col class="cf"><col class="cp"><col class="ce"><col class="ca"></colgroup>
-      <thead><tr><th class="center">✓</th><th>Tarea</th><th>Entrega</th><th>Prioridad</th><th>Estado</th><th></th></tr></thead>
+      <table><colgroup><col style="width:32px"><col class="ck"><col class="ct"><col class="cf"><col class="cp"><col class="ce"><col class="ca"></colgroup>
+      <thead><tr><th></th><th class="center">✓</th><th>Tarea</th><th>Entrega</th><th>Prioridad</th><th>Estado</th><th></th></tr></thead>
       <tbody id="tbody-nacho"></tbody></table>
       <div class="empty-state" id="empty-nacho" style="display:none">No hay tareas en esta vista.</div>
     </div></div>
@@ -251,172 +259,222 @@ let tasks = [];
 let filters = { mary: 'pendientes', nacho: 'pendientes' };
 let currentPage = 'home';
 
-const q = query(collection(db, 'tareas'), orderBy('creadaEn', 'desc'));
-onSnapshot(q, (snapshot) => {
-  tasks = snapshot.docs.map(d => ({ _id: d.id, ...d.data() }));
-  renderHome();
-  if (currentPage === 'mary') renderPersona('mary', 'María Balestrini');
-  if (currentPage === 'nacho') renderPersona('nacho', 'Ignacio Ríos');
-});
+const today = () => new Date().toISOString().slice(0,10);
+const isV = t => !(!t.fecha || t.done) && t.fecha < today();
+const fmt = s => { if (!s) return '—'; const [y,m,d] = s.split('-'); return `${d}/${m}/${y}`; };
+const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const estadoBadge = t => t.done ? '<span class="badge badge-listo">Listo</span>' : isV(t) ? '<span class="badge badge-vencida">Vencida</span>' : '<span class="badge badge-pendiente">Pendiente</span>';
+const prioBadge = p => { const m={alta:'badge-alta',media:'badge-media',baja:'badge-baja'}; const l={alta:'Alta',media:'Media',baja:'Baja'}; return `<span class="badge ${m[p]||'badge-media'}">${l[p]||p}</span>`; };
 
-function today() { return new Date().toISOString().slice(0, 10); }
-function isV(t) { return !(!t.fecha || t.done) && t.fecha < today(); }
-function fmt(s) { if (!s) return '—'; const [y,m,d] = s.split('-'); return d+'/'+m+'/'+y; }
-function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function estadoBadge(t) {
-  if (t.done) return '<span class="badge badge-listo">Listo</span>';
-  if (isV(t)) return '<span class="badge badge-vencida">Vencida</span>';
-  return '<span class="badge badge-pendiente">Pendiente</span>';
-}
-function prioBadge(p) {
-  const m = {alta:'badge-alta',media:'badge-media',baja:'badge-baja'};
-  const l = {alta:'Alta',media:'Media',baja:'Baja'};
-  return `<span class="badge ${m[p]||'badge-media'}">${l[p]||p}</span>`;
-}
-
-window.goTo = function(id) {
+function goTo(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('pg-'+id).classList.add('active');
-  window.scrollTo(0, 0);
+  window.scrollTo(0,0);
   currentPage = id;
-  if (id === 'mary') renderPersona('mary', 'María Balestrini');
-  if (id === 'nacho') renderPersona('nacho', 'Ignacio Ríos');
+  if (id === 'mary') renderPersona('mary','María Balestrini');
+  if (id === 'nacho') renderPersona('nacho','Ignacio Ríos');
   if (id === 'home') renderHome();
 }
 
 function renderHome() {
-  [['mary','María Balestrini'],['nacho','Ignacio Ríos']].forEach(([key, resp]) => {
+  [['mary','María Balestrini'],['nacho','Ignacio Ríos']].forEach(([key,resp]) => {
     const mine = tasks.filter(t => t.resp === resp);
     const pend = mine.filter(t => !t.done && !isV(t)).length;
     const alta = mine.filter(t => !t.done && t.prio === 'alta').length;
-    const countEl = document.getElementById('home-'+key+'-count');
-    const urgEl = document.getElementById('home-'+key+'-urgent');
-    if (countEl) countEl.textContent = pend + (pend === 1 ? ' pendiente' : ' pendientes');
-    if (urgEl) {
-      if (alta > 0) { urgEl.textContent = alta + ' urgente'+(alta>1?'s':''); urgEl.style.display='inline'; }
-      else { urgEl.style.display = 'none'; }
-    }
+    const ce = document.getElementById('home-'+key+'-count');
+    const ue = document.getElementById('home-'+key+'-urgent');
+    if (ce) ce.textContent = pend + (pend===1?' pendiente':' pendientes');
+    if (ue) { if (alta>0){ue.textContent=alta+' urgente'+(alta>1?'s':'');ue.style.display='inline';}else{ue.style.display='none';} }
   });
 }
 
 function renderPersona(key, resp) {
   const f = filters[key];
   const mine = tasks.filter(t => t.resp === resp);
-  const tot = mine.length;
-  const lis = mine.filter(t => t.done).length;
-  const ven = mine.filter(t => isV(t)).length;
-  const pen = mine.filter(t => !t.done && !isV(t)).length;
+  const tot=mine.length, lis=mine.filter(t=>t.done).length, ven=mine.filter(t=>isV(t)).length, pen=mine.filter(t=>!t.done&&!isV(t)).length;
   document.getElementById(key+'-total').textContent = tot;
   document.getElementById(key+'-listas').textContent = lis;
   document.getElementById(key+'-pend').textContent = pen;
   document.getElementById(key+'-venc').textContent = ven;
-  document.getElementById(key+'-sub').textContent = pen + ' pendientes · ' + lis + ' completadas';
+  document.getElementById(key+'-sub').textContent = pen+' pendientes · '+lis+' completadas';
   const vis = mine.filter(t => {
-    if (f === 'listas') return t.done;
-    if (f === 'pendientes') return !t.done && !isV(t);
-    if (f === 'vencidas') return isV(t);
+    if (f==='listas') return t.done;
+    if (f==='pendientes') return !t.done && !isV(t);
+    if (f==='vencidas') return isV(t);
     return true;
   }).sort((a,b) => {
+    if (a.orden !== undefined && b.orden !== undefined) return a.orden - b.orden;
+    if (a.orden !== undefined) return -1;
+    if (b.orden !== undefined) return 1;
     if (!a.fecha && !b.fecha) return 0;
-    if (!a.fecha) return 1;
-    if (!b.fecha) return -1;
-    const da = a.fecha + (a.hora||'00:00');
-    const db = b.fecha + (b.hora||'00:00');
-    return da < db ? -1 : da > db ? 1 : 0;
+    if (!a.fecha) return 1; if (!b.fecha) return -1;
+    const da=a.fecha+(a.hora||'00:00'), db=b.fecha+(b.hora||'00:00');
+    return da<db?-1:da>db?1:0;
   });
   const tbody = document.getElementById('tbody-'+key);
   const empty = document.getElementById('empty-'+key);
-  if (!vis.length) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
-  empty.style.display = 'none';
-  tbody.innerHTML = vis.map(t => {
+  if (!vis.length) { tbody.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+  tbody.innerHTML = vis.map((t,idx) => {
     const uid = t._id;
     const v = isV(t);
     const hd = t.desc && t.desc.trim();
-    return `<tr>
-      <td class="center"><input type="checkbox" ${t.done?'checked':''} onchange="toggleTask('${uid}','${key}','${resp.replace(/'/g,"\\'")}')"></td>
+    return `<tr draggable="true" data-uid="${uid}" data-key="${key}">
+      <td class="center"><span class="drag-handle" title="Arrastrar">⠿</span></td>
+      <td class="center"><input type="checkbox" ${t.done?'checked':''} data-uid="${uid}" data-action="toggle"></td>
       <td>
-        <span class="task-name ${t.done?'done-t':''}" contenteditable="true" onblur="editField('${uid}','tarea',this.innerText)">${esc(t.tarea)}</span>
-        ${hd?`<div><button class="btn-expand" onclick="toggleDesc('${uid}','${key}')">${t._open?'▴ ocultar':'▾ ver detalle'}</button></div>`:''}
+        <span class="task-name ${t.done?'done-t':''}" contenteditable="true" data-uid="${uid}" data-field="tarea">${esc(t.tarea)}</span>
+        ${hd?`<div><button class="btn-expand" data-uid="${uid}" data-key="${key}">${t._open?'▴ ocultar':'▾ ver detalle'}</button></div>`:''}
       </td>
       <td><span class="fecha-cell ${v?'vencida':''}">${fmt(t.fecha)}${t.hora?`<span class="hora">${t.hora}</span>`:''}</span></td>
       <td>${prioBadge(t.prio)}</td>
       <td>${estadoBadge(t)}</td>
-      <td><button class="btn-del" onclick="delTask('${uid}')">×</button></td>
+      <td><button class="btn-del" data-uid="${uid}" data-action="delete">×</button></td>
     </tr>
-    ${hd?`<tr id="d-${key}-${uid}" style="display:${t._open?'table-row':'none'}">
-      <td></td>
+    ${hd?`<tr id="d-${key}-${uid}" data-desc-row="true" style="display:${t._open?'table-row':'none'}">
+      <td></td><td></td>
       <td colspan="5" style="padding:0 14px 14px">
-        <div class="task-desc"><span contenteditable="true" onblur="editField('${uid}','desc',this.innerText)">${esc(t.desc||'')}</span></div>
+        <div class="task-desc"><span contenteditable="true" data-uid="${uid}" data-field="desc">${esc(t.desc||'')}</span></div>
       </td>
     </tr>`:''}`;
   }).join('');
 }
 
-window.addTask = async function() {
+const q = query(collection(db,'tareas'), orderBy('creadaEn','desc'));
+onSnapshot(q, snap => {
+  tasks = snap.docs.map(d => ({_id:d.id,...d.data()}));
+  renderHome();
+  if (currentPage==='mary') renderPersona('mary','María Balestrini');
+  if (currentPage==='nacho') renderPersona('nacho','Ignacio Ríos');
+});
+
+async function addTask() {
   const tarea = document.getElementById('inp-tarea').value.trim();
   if (!tarea) { document.getElementById('inp-tarea').focus(); return; }
-  await addDoc(collection(db, 'tareas'), {
-    tarea,
-    desc: document.getElementById('inp-desc').value.trim(),
-    resp: document.getElementById('inp-resp').value,
-    fecha: document.getElementById('inp-fecha').value,
-    hora: document.getElementById('inp-hora').value,
-    prio: document.getElementById('inp-prio').value,
-    done: false,
-    _open: false,
-    creadaEn: Date.now()
-  });
-  ['inp-tarea','inp-desc','inp-fecha','inp-hora'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('inp-resp').value = '';
-  document.getElementById('inp-tarea').focus();
+  try {
+    await addDoc(collection(db,'tareas'), {
+      tarea,
+      desc: document.getElementById('inp-desc').value.trim(),
+      resp: document.getElementById('inp-resp').value,
+      fecha: document.getElementById('inp-fecha').value,
+      hora: document.getElementById('inp-hora').value,
+      prio: document.getElementById('inp-prio').value,
+      done: false, _open: false, creadaEn: Date.now()
+    });
+    ['inp-tarea','inp-desc','inp-fecha','inp-hora'].forEach(id => document.getElementById(id).value='');
+    document.getElementById('inp-resp').value='';
+    document.getElementById('inp-tarea').focus();
+  } catch(e) { alert('Error al agregar: '+e.message); }
 }
 
-window.toggleTask = async function(uid, key, resp) {
-  const t = tasks.find(t => t._id === uid);
-  if (!t) return;
-  await updateDoc(doc(db, 'tareas', uid), { done: !t.done });
-}
-
-window.delTask = async function(uid) {
-  if (confirm('¿Eliminar esta tarea?')) {
-    await deleteDoc(doc(db, 'tareas', uid));
-  }
-}
-
-window.editField = async function(uid, field, val) {
-  await updateDoc(doc(db, 'tareas', uid), { [field]: val.trim ? val.trim() : val });
-}
-
-window.toggleDesc = function(uid, key) {
-  const t = tasks.find(t => t._id === uid);
-  if (!t) return;
-  t._open = !t._open;
-  const row = document.getElementById('d-'+key+'-'+uid);
-  if (row) row.style.display = t._open ? 'table-row' : 'none';
-  const btn = row && row.previousElementSibling.querySelector('.btn-expand');
-  if (btn) btn.textContent = t._open ? '▴ ocultar' : '▾ ver detalle';
-}
-
-window.setFilter = function(key, f, btn) {
-  filters[key] = f;
-  const resp = key === 'mary' ? 'María Balestrini' : 'Ignacio Ríos';
-  btn.closest('.filters').querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderPersona(key, resp);
-}
-
-window.exportCSV = function(resp) {
-  const mine = tasks.filter(t => t.resp === resp);
+function exportCSV(resp) {
+  const mine = tasks.filter(t => t.resp===resp);
   const rows = [['Tarea','Descripción','Fecha entrega','Hora','Prioridad','Estado']];
-  mine.forEach(t => rows.push([t.tarea, t.desc||'', t.fecha||'', t.hora||'', t.prio, t.done?'Listo':isV(t)?'Vencida':'Pendiente']));
-  const csv = rows.map(r => r.map(c => '"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
+  mine.forEach(t => rows.push([t.tarea,t.desc||'',t.fecha||'',t.hora||'',t.prio,t.done?'Listo':isV(t)?'Vencida':'Pendiente']));
+  const csv = rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
   const a = document.createElement('a');
-  a.href = 'data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);
-  a.download = 'tareas-'+resp.split(' ')[0].toLowerCase()+'.csv';
+  a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);
+  a.download='tareas-'+resp.split(' ')[0].toLowerCase()+'.csv';
   a.click();
 }
 
-document.getElementById('inp-tarea').addEventListener('keydown', e => { if (e.key === 'Enter') addTask(); });
+document.getElementById('btn-agregar').addEventListener('click', addTask);
+document.getElementById('inp-tarea').addEventListener('keydown', e => { if(e.key==='Enter') addTask(); });
+document.getElementById('folder-mary').addEventListener('click', () => goTo('mary'));
+document.getElementById('folder-nacho').addEventListener('click', () => goTo('nacho'));
+document.getElementById('back-mary').addEventListener('click', () => goTo('home'));
+document.getElementById('back-nacho').addEventListener('click', () => goTo('home'));
+document.getElementById('export-mary').addEventListener('click', () => exportCSV('María Balestrini'));
+document.getElementById('export-nacho').addEventListener('click', () => exportCSV('Ignacio Ríos'));
+
+document.getElementById('filters-mary').addEventListener('click', e => {
+  const btn = e.target.closest('.filter-btn');
+  if (!btn) return;
+  document.querySelectorAll('#filters-mary .filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  filters.mary = btn.dataset.f;
+  renderPersona('mary','María Balestrini');
+});
+
+document.getElementById('filters-nacho').addEventListener('click', e => {
+  const btn = e.target.closest('.filter-btn');
+  if (!btn) return;
+  document.querySelectorAll('#filters-nacho .filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  filters.nacho = btn.dataset.f;
+  renderPersona('nacho','Ignacio Ríos');
+});
+
+['tbody-mary','tbody-nacho'].forEach(tbodyId => {
+  const key = tbodyId.replace('tbody-','');
+  document.getElementById(tbodyId).addEventListener('click', async e => {
+    const cb = e.target.closest('input[data-action="toggle"]');
+    if (cb) {
+      const t = tasks.find(t=>t._id===cb.dataset.uid);
+      if (t) await updateDoc(doc(db,'tareas',t._id),{done:!t.done});
+      return;
+    }
+    const del = e.target.closest('button[data-action="delete"]');
+    if (del) {
+      if (confirm('¿Eliminar esta tarea?')) await deleteDoc(doc(db,'tareas',del.dataset.uid));
+      return;
+    }
+    const exp = e.target.closest('.btn-expand');
+    if (exp) {
+      const uid = exp.dataset.uid;
+      const k = exp.dataset.key;
+      const t = tasks.find(t=>t._id===uid);
+      if (!t) return;
+      t._open = !t._open;
+      const row = document.getElementById('d-'+k+'-'+uid);
+      if (row) row.style.display = t._open?'table-row':'none';
+      exp.textContent = t._open?'▴ ocultar':'▾ ver detalle';
+    }
+  });
+  document.getElementById(tbodyId).addEventListener('blur', async e => {
+    const el = e.target.closest('[data-field]');
+    if (!el) return;
+    await updateDoc(doc(db,'tareas',el.dataset.uid),{[el.dataset.field]:el.innerText.trim()});
+  }, true);
+});
+
+let dragSrcUid = null;
+['tbody-mary','tbody-nacho'].forEach(tbodyId => {
+  const tbody = document.getElementById(tbodyId);
+  tbody.addEventListener('dragstart', e => {
+    const tr = e.target.closest('tr[data-uid]');
+    if (!tr) return;
+    dragSrcUid = tr.dataset.uid;
+    setTimeout(() => tr.classList.add('dragging'), 0);
+  });
+  tbody.addEventListener('dragend', e => {
+    const tr = e.target.closest('tr[data-uid]');
+    if (tr) tr.classList.remove('dragging');
+    tbody.querySelectorAll('.drag-over').forEach(r => r.classList.remove('drag-over'));
+  });
+  tbody.addEventListener('dragover', e => {
+    e.preventDefault();
+    const tr = e.target.closest('tr[data-uid]');
+    if (!tr || tr.dataset.uid === dragSrcUid) return;
+    tbody.querySelectorAll('.drag-over').forEach(r => r.classList.remove('drag-over'));
+    tr.classList.add('drag-over');
+  });
+  tbody.addEventListener('drop', async e => {
+    e.preventDefault();
+    const targetTr = e.target.closest('tr[data-uid]');
+    if (!targetTr || targetTr.dataset.uid === dragSrcUid) return;
+    const key = targetTr.dataset.key;
+    const resp = key==='mary'?'María Balestrini':'Ignacio Ríos';
+    const srcIdx = tasks.findIndex(t=>t._id===dragSrcUid);
+    const tgtIdx = tasks.findIndex(t=>t._id===targetTr.dataset.uid);
+    if (srcIdx<0||tgtIdx<0) return;
+    const [moved] = tasks.splice(srcIdx,1);
+    tasks.splice(tgtIdx,0,moved);
+    const mine = tasks.filter(t=>t.resp===resp);
+    await Promise.all(mine.map((t,i) => updateDoc(doc(db,'tareas',t._id),{orden:i})));
+    targetTr.classList.remove('drag-over');
+  });
+});
 </script>
 </body>
 </html>

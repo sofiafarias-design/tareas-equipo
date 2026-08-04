@@ -97,10 +97,6 @@ input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent);
 .badge-vencida { background: var(--danger-bg); color: var(--danger-text); }
 .btn-del { background: none; border: none; cursor: pointer; color: var(--text-faint); font-size: 17px; line-height: 1; padding: 3px 6px; border-radius: var(--radius); transition: color .15s, background .15s; }
 .btn-del:hover { color: var(--danger); background: var(--danger-bg); }
-.drag-handle { cursor: grab; color: var(--text-faint); font-size: 16px; padding: 0 6px; user-select: none; }
-.drag-handle:active { cursor: grabbing; }
-tr.dragging { opacity: 0.4; background: var(--accent-bg) !important; }
-tr.drag-over { border-top: 2px solid var(--accent); }
 .empty-state { text-align: center; padding: 2.5rem; color: var(--text-faint); font-size: 13px; }
 .status-bar { font-size: 12px; color: var(--text-muted); text-align: center; padding: 8px; background: var(--accent-bg); display: none; }
 .status-bar.show { display: block; }
@@ -210,7 +206,6 @@ tr.drag-over { border-top: 2px solid var(--accent); }
     <h1>Tracker de Tareas</h1>
   </header>
   <main class="container">
-    <div class="persona-avatar av-i">IR</div>
     <div class="persona-header">
       <div class="persona-avatar av-i">IR</div>
       <div><div class="persona-name">Nacho</div><div class="persona-sub" id="nacho-sub">—</div></div>
@@ -259,6 +254,7 @@ let tasks = [];
 let filters = { mary: 'pendientes', nacho: 'pendientes' };
 let currentPage = 'home';
 
+// ---- utilidades ----
 const today = () => new Date().toISOString().slice(0,10);
 const isV = t => !(!t.fecha || t.done) && t.fecha < today();
 const fmt = s => { if (!s) return '—'; const [y,m,d] = s.split('-'); return `${d}/${m}/${y}`; };
@@ -266,6 +262,7 @@ const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replac
 const estadoBadge = t => t.done ? '<span class="badge badge-listo">Listo</span>' : isV(t) ? '<span class="badge badge-vencida">Vencida</span>' : '<span class="badge badge-pendiente">Pendiente</span>';
 const prioBadge = p => { const m={alta:'badge-alta',media:'badge-media',baja:'badge-baja'}; const l={alta:'Alta',media:'Media',baja:'Baja'}; return `<span class="badge ${m[p]||'badge-media'}">${l[p]||p}</span>`; };
 
+// ---- navegación ----
 function goTo(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('pg-'+id).classList.add('active');
@@ -276,6 +273,7 @@ function goTo(id) {
   if (id === 'home') renderHome();
 }
 
+// ---- render home ----
 function renderHome() {
   [['mary','María Balestrini'],['nacho','Ignacio Ríos']].forEach(([key,resp]) => {
     const mine = tasks.filter(t => t.resp === resp);
@@ -288,6 +286,7 @@ function renderHome() {
   });
 }
 
+// ---- render persona ----
 function renderPersona(key, resp) {
   const f = filters[key];
   const mine = tasks.filter(t => t.resp === resp);
@@ -319,14 +318,23 @@ function renderPersona(key, resp) {
     const uid = t._id;
     const v = isV(t);
     const hd = t.desc && t.desc.trim();
-    return `<tr draggable="true" data-uid="${uid}" data-key="${key}">
-      <td class="center"><span class="drag-handle" title="Arrastrar">⠿</span></td>
+    return `<tr data-uid="${uid}" data-key="${key}">
+      <td class="center">
+        <input type="number" min="1" max="${vis.length}" value="${idx+1}"
+          data-uid="${uid}" data-action="reorder" data-key="${key}"
+          style="width:36px;font-family:'DM Mono',monospace;font-size:12px;text-align:center;border:0.5px solid var(--border);border-radius:4px;background:var(--bg);color:var(--text-muted);padding:2px 4px;outline:none">
+      </td>
       <td class="center"><input type="checkbox" ${t.done?'checked':''} data-uid="${uid}" data-action="toggle"></td>
       <td>
         <span class="task-name ${t.done?'done-t':''}" contenteditable="true" data-uid="${uid}" data-field="tarea">${esc(t.tarea)}</span>
         ${hd?`<div><button class="btn-expand" data-uid="${uid}" data-key="${key}">${t._open?'▴ ocultar':'▾ ver detalle'}</button></div>`:''}
       </td>
-      <td><span class="fecha-cell ${v?'vencida':''}">${fmt(t.fecha)}${t.hora?`<span class="hora">${t.hora}</span>`:''}</span></td>
+      <td>
+        <input type="date" value="${t.fecha||''}" data-uid="${uid}" data-field="fecha"
+          style="font-family:'DM Mono',monospace;font-size:12px;font-weight:500;border:none;background:transparent;color:${v?'var(--danger)':'var(--text)'};cursor:pointer;width:110px;outline:none;padding:0">
+        <input type="time" value="${t.hora||''}" data-uid="${uid}" data-field="hora"
+          style="font-family:'DM Mono',monospace;font-size:11px;border:none;background:transparent;color:var(--text-muted);cursor:pointer;width:80px;outline:none;padding:0;display:block;margin-top:2px">
+      </td>
       <td>${prioBadge(t.prio)}</td>
       <td>${estadoBadge(t)}</td>
       <td><button class="btn-del" data-uid="${uid}" data-action="delete">×</button></td>
@@ -340,6 +348,7 @@ function renderPersona(key, resp) {
   }).join('');
 }
 
+// ---- Firebase listener ----
 const q = query(collection(db,'tareas'), orderBy('creadaEn','desc'));
 onSnapshot(q, snap => {
   tasks = snap.docs.map(d => ({_id:d.id,...d.data()}));
@@ -348,6 +357,7 @@ onSnapshot(q, snap => {
   if (currentPage==='nacho') renderPersona('nacho','Ignacio Ríos');
 });
 
+// ---- agregar tarea ----
 async function addTask() {
   const tarea = document.getElementById('inp-tarea').value.trim();
   if (!tarea) { document.getElementById('inp-tarea').focus(); return; }
@@ -367,6 +377,7 @@ async function addTask() {
   } catch(e) { alert('Error al agregar: '+e.message); }
 }
 
+// ---- exportar CSV ----
 function exportCSV(resp) {
   const mine = tasks.filter(t => t.resp===resp);
   const rows = [['Tarea','Descripción','Fecha entrega','Hora','Prioridad','Estado']];
@@ -378,6 +389,7 @@ function exportCSV(resp) {
   a.click();
 }
 
+// ---- event listeners (sin onclick en HTML) ----
 document.getElementById('btn-agregar').addEventListener('click', addTask);
 document.getElementById('inp-tarea').addEventListener('keydown', e => { if(e.key==='Enter') addTask(); });
 document.getElementById('folder-mary').addEventListener('click', () => goTo('mary'));
@@ -387,6 +399,7 @@ document.getElementById('back-nacho').addEventListener('click', () => goTo('home
 document.getElementById('export-mary').addEventListener('click', () => exportCSV('María Balestrini'));
 document.getElementById('export-nacho').addEventListener('click', () => exportCSV('Ignacio Ríos'));
 
+// Filtros Mary
 document.getElementById('filters-mary').addEventListener('click', e => {
   const btn = e.target.closest('.filter-btn');
   if (!btn) return;
@@ -396,6 +409,7 @@ document.getElementById('filters-mary').addEventListener('click', e => {
   renderPersona('mary','María Balestrini');
 });
 
+// Filtros Nacho
 document.getElementById('filters-nacho').addEventListener('click', e => {
   const btn = e.target.closest('.filter-btn');
   if (!btn) return;
@@ -405,20 +419,25 @@ document.getElementById('filters-nacho').addEventListener('click', e => {
   renderPersona('nacho','Ignacio Ríos');
 });
 
+// Delegación de eventos en tablas
 ['tbody-mary','tbody-nacho'].forEach(tbodyId => {
   const key = tbodyId.replace('tbody-','');
+  const resp = key==='mary'?'María Balestrini':'Ignacio Ríos';
   document.getElementById(tbodyId).addEventListener('click', async e => {
+    // Toggle checkbox
     const cb = e.target.closest('input[data-action="toggle"]');
     if (cb) {
       const t = tasks.find(t=>t._id===cb.dataset.uid);
       if (t) await updateDoc(doc(db,'tareas',t._id),{done:!t.done});
       return;
     }
+    // Eliminar
     const del = e.target.closest('button[data-action="delete"]');
     if (del) {
       if (confirm('¿Eliminar esta tarea?')) await deleteDoc(doc(db,'tareas',del.dataset.uid));
       return;
     }
+    // Ver detalle
     const exp = e.target.closest('.btn-expand');
     if (exp) {
       const uid = exp.dataset.uid;
@@ -431,48 +450,33 @@ document.getElementById('filters-nacho').addEventListener('click', e => {
       exp.textContent = t._open?'▴ ocultar':'▾ ver detalle';
     }
   });
+  // Editar campos en línea
   document.getElementById(tbodyId).addEventListener('blur', async e => {
     const el = e.target.closest('[data-field]');
     if (!el) return;
     await updateDoc(doc(db,'tareas',el.dataset.uid),{[el.dataset.field]:el.innerText.trim()});
   }, true);
+  document.getElementById(tbodyId).addEventListener('change', async e => {
+    const el = e.target.closest('input[data-field]');
+    if (!el) return;
+    await updateDoc(doc(db,'tareas',el.dataset.uid),{[el.dataset.field]:el.value});
+  });
 });
-
-let dragSrcUid = null;
+// ---- reorden numérico ----
 ['tbody-mary','tbody-nacho'].forEach(tbodyId => {
-  const tbody = document.getElementById(tbodyId);
-  tbody.addEventListener('dragstart', e => {
-    const tr = e.target.closest('tr[data-uid]');
-    if (!tr) return;
-    dragSrcUid = tr.dataset.uid;
-    setTimeout(() => tr.classList.add('dragging'), 0);
-  });
-  tbody.addEventListener('dragend', e => {
-    const tr = e.target.closest('tr[data-uid]');
-    if (tr) tr.classList.remove('dragging');
-    tbody.querySelectorAll('.drag-over').forEach(r => r.classList.remove('drag-over'));
-  });
-  tbody.addEventListener('dragover', e => {
-    e.preventDefault();
-    const tr = e.target.closest('tr[data-uid]');
-    if (!tr || tr.dataset.uid === dragSrcUid) return;
-    tbody.querySelectorAll('.drag-over').forEach(r => r.classList.remove('drag-over'));
-    tr.classList.add('drag-over');
-  });
-  tbody.addEventListener('drop', async e => {
-    e.preventDefault();
-    const targetTr = e.target.closest('tr[data-uid]');
-    if (!targetTr || targetTr.dataset.uid === dragSrcUid) return;
-    const key = targetTr.dataset.key;
-    const resp = key==='mary'?'María Balestrini':'Ignacio Ríos';
-    const srcIdx = tasks.findIndex(t=>t._id===dragSrcUid);
-    const tgtIdx = tasks.findIndex(t=>t._id===targetTr.dataset.uid);
-    if (srcIdx<0||tgtIdx<0) return;
-    const [moved] = tasks.splice(srcIdx,1);
-    tasks.splice(tgtIdx,0,moved);
-    const mine = tasks.filter(t=>t.resp===resp);
+  const key = tbodyId.replace('tbody-','');
+  const resp = key==='mary'?'María Balestrini':'Ignacio Ríos';
+  document.getElementById(tbodyId).addEventListener('change', async e => {
+    const inp = e.target.closest('input[data-action="reorder"]');
+    if (!inp) return;
+    const uid = inp.dataset.uid;
+    const newPos = parseInt(inp.value) - 1;
+    const mine = tasks.filter(t => t.resp === resp && (!filters[key] || (filters[key]==='pendientes'?(!t.done&&!isV(t)):filters[key]==='listas'?t.done:filters[key]==='vencidas'?isV(t):true)));
+    const srcIdx = mine.findIndex(t => t._id === uid);
+    if (srcIdx < 0 || newPos < 0 || newPos >= mine.length || newPos === srcIdx) return;
+    const [moved] = mine.splice(srcIdx, 1);
+    mine.splice(newPos, 0, moved);
     await Promise.all(mine.map((t,i) => updateDoc(doc(db,'tareas',t._id),{orden:i})));
-    targetTr.classList.remove('drag-over');
   });
 });
 </script>

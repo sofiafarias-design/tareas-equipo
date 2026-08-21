@@ -8,7 +8,7 @@
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  --bg: #f7f6f3; --surface: #ffffff; --border: #e4e2dc; --border-strong: #ccc9c0;
+  --bg: #f7f6f3; --surface: #fff; --border: #e4e2dc; --border-strong: #ccc9c0;
   --text: #1a1916; --text-muted: #7a7870; --text-faint: #b0ada5;
   --accent: #1D9E75; --accent-bg: #e1f5ee; --accent-text: #0a5c42;
   --warn: #c4620f; --danger: #b92b2b; --danger-bg: #fcebeb; --danger-text: #7a1a1a;
@@ -16,7 +16,7 @@
   --prio-media-bg: #faeeda; --prio-media-text: #7a3c08;
   --prio-baja-bg: #eaf3de; --prio-baja-text: #2e5a0a;
   --radius: 8px; --radius-lg: 12px;
-  --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
 }
 body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 0 0 3rem; }
 .site-header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 1.1rem 1.5rem; display: flex; align-items: center; gap: 1rem; position: sticky; top: 0; z-index: 10; box-shadow: var(--shadow); }
@@ -24,9 +24,8 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 .site-header .subtitle { font-size: 12px; color: var(--text-muted); font-family: 'DM Mono', monospace; }
 .btn-back { font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text-muted); background: none; border: 1px solid var(--border); border-radius: var(--radius); padding: 5px 12px; cursor: pointer; transition: all .15s; white-space: nowrap; }
 .btn-back:hover { border-color: var(--border-strong); color: var(--text); }
-.page { display: none; }
-.page.active { display: block; }
-.container { max-width: 100%; padding: 1.25rem; }
+.page { display: none; } .page.active { display: block; }
+.container { padding: 1.25rem; }
 .stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 1.25rem; }
 .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: .85rem 1rem; box-shadow: var(--shadow); }
 .stat-num { font-size: 24px; font-weight: 300; font-family: 'DM Mono', monospace; line-height: 1; margin-bottom: 3px; }
@@ -38,7 +37,8 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 .form-group label { font-size: 11px; color: var(--text-muted); }
 .form-group input, .form-group select, .form-group textarea { font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 7px 10px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); color: var(--text); outline: none; width: 100%; transition: border-color .15s; }
 .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--accent); background: #fff; }
-.form-group.tarea { flex: 3; min-width: 180px; } .form-group.desc { width: 100%; flex: none; } .form-group.resp { flex: 2; min-width: 150px; } .form-group.fecha { flex: 1.5; min-width: 130px; } .form-group.prio { flex: 1; min-width: 110px; }
+.form-group.tarea { flex: 3; min-width: 180px; } .form-group.desc { width: 100%; flex: none; }
+.form-group.resp { flex: 2; min-width: 150px; } .form-group.fecha { flex: 1.5; min-width: 130px; } .form-group.prio { flex: 1; min-width: 110px; }
 .form-group textarea { resize: vertical; min-height: 58px; line-height: 1.5; }
 .form-row-top { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 8px; }
 .form-row-bottom { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-end; }
@@ -69,7 +69,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 .table-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow); overflow: hidden; }
 .table-wrap { overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-col.ck { width: 44px; } col.ct { width: auto; } col.cf { width: 140px; } col.cp { width: 82px; } col.ce { width: 98px; } col.ca { width: 44px; }
+col.co { width: 54px; } col.ck { width: 44px; } col.ct { width: auto; } col.cf { width: 145px; } col.cp { width: 82px; } col.ce { width: 98px; } col.ca { width: 44px; }
 thead tr { border-bottom: 1px solid var(--border); }
 th { font-size: 10px; font-weight: 500; color: var(--text-faint); text-align: left; padding: 11px 13px; letter-spacing: .6px; text-transform: uppercase; white-space: nowrap; background: var(--bg); }
 th.center { text-align: center; }
@@ -79,13 +79,13 @@ tbody tr:hover { background: #fafaf8; }
 td { padding: 11px 13px; vertical-align: middle; font-size: 13px; }
 td.center { text-align: center; }
 input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; }
-.task-name { font-weight: 400; line-height: 1.4; outline: none; border-radius: 4px; padding: 2px 3px; margin: -2px -3px; display: block; }
+.task-name { font-weight: 400; line-height: 1.4; outline: none; border-radius: 4px; padding: 2px 3px; display: block; }
 .task-name:focus { outline: 1px solid var(--accent); background: var(--bg); }
 .task-name.done-t { text-decoration: line-through; color: var(--text-faint); }
-.task-desc { font-size: 13px; color: var(--text); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; line-height: 1.7; white-space: pre-wrap; word-break: break-word; box-shadow: var(--shadow); }
+.task-desc { font-size: 13px; color: var(--text); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; line-height: 1.7; white-space: pre-wrap; word-break: break-word; }
 .btn-expand { display: inline-block; background: var(--accent-bg); border: none; cursor: pointer; color: var(--accent-text); font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 99px; margin-top: 5px; white-space: nowrap; transition: background .15s; }
 .btn-expand:hover { background: #c5ead9; }
-.fecha-cell { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--text); font-weight: 500; }
+.fecha-cell { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text); font-weight: 500; }
 .fecha-cell .hora { font-size: 11px; color: var(--text-muted); font-weight: 400; display: block; margin-top: 1px; }
 .fecha-cell.vencida { color: var(--danger); font-weight: 600; }
 .badge { display: inline-block; font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 99px; white-space: nowrap; }
@@ -98,8 +98,8 @@ input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent);
 .btn-del { background: none; border: none; cursor: pointer; color: var(--text-faint); font-size: 17px; line-height: 1; padding: 3px 6px; border-radius: var(--radius); transition: color .15s, background .15s; }
 .btn-del:hover { color: var(--danger); background: var(--danger-bg); }
 .empty-state { text-align: center; padding: 2.5rem; color: var(--text-faint); font-size: 13px; }
-.status-bar { font-size: 12px; color: var(--text-muted); text-align: center; padding: 8px; background: var(--accent-bg); display: none; }
-.status-bar.show { display: block; }
+.orden-inp { width: 40px; font-family: 'DM Mono', monospace; font-size: 12px; text-align: center; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); color: var(--text-muted); padding: 4px 2px; outline: none; transition: border-color .2s; }
+.orden-inp:focus { border-color: var(--accent); color: var(--text); }
 </style>
 </head>
 <body>
@@ -111,7 +111,6 @@ input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent);
     <span class="subtitle">seguimiento del equipo</span>
   </header>
   <main class="container">
-    <div id="status-bar" class="status-bar">Conectando con Firebase...</div>
     <div class="form-card">
       <div class="form-title">Nueva tarea</div>
       <div class="form-row-top">
@@ -176,7 +175,7 @@ input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent);
       <div><div class="persona-name">Mary</div><div class="persona-sub" id="mary-sub">—</div></div>
     </div>
     <div class="stats">
-      <div class="stat-card"><div class="stat-num" id="mary-total">0</div><div class="stat-label">Total tareas</div></div>
+      <div class="stat-card"><div class="stat-num" id="mary-total">0</div><div class="stat-label">Total</div></div>
       <div class="stat-card"><div class="stat-num green" id="mary-listas">0</div><div class="stat-label">Completadas</div></div>
       <div class="stat-card"><div class="stat-num orange" id="mary-pend">0</div><div class="stat-label">Pendientes</div></div>
       <div class="stat-card"><div class="stat-num red" id="mary-venc">0</div><div class="stat-label">Vencidas</div></div>
@@ -191,10 +190,10 @@ input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent);
       <button class="btn-export" id="export-mary">Exportar CSV ↓</button>
     </div>
     <div class="table-card"><div class="table-wrap">
-      <table><colgroup><col style="width:32px"><col class="ck"><col class="ct"><col class="cf"><col class="cp"><col class="ce"><col class="ca"></colgroup>
-      <thead><tr><th></th><th class="center">✓</th><th>Tarea</th><th>Entrega</th><th>Prioridad</th><th>Estado</th><th></th></tr></thead>
+      <table><colgroup><col class="co"><col class="ck"><col class="ct"><col class="cf"><col class="cp"><col class="ce"><col class="ca"></colgroup>
+      <thead><tr><th class="center">#</th><th class="center">✓</th><th>Tarea</th><th>Entrega</th><th>Prioridad</th><th>Estado</th><th></th></tr></thead>
       <tbody id="tbody-mary"></tbody></table>
-      <div class="empty-state" id="empty-mary" style="display:none">No hay tareas en esta vista.</div>
+      <div class="empty-state" id="empty-mary" style="display:none">No hay tareas.</div>
     </div></div>
   </main>
 </div>
@@ -211,7 +210,7 @@ input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent);
       <div><div class="persona-name">Nacho</div><div class="persona-sub" id="nacho-sub">—</div></div>
     </div>
     <div class="stats">
-      <div class="stat-card"><div class="stat-num" id="nacho-total">0</div><div class="stat-label">Total tareas</div></div>
+      <div class="stat-card"><div class="stat-num" id="nacho-total">0</div><div class="stat-label">Total</div></div>
       <div class="stat-card"><div class="stat-num green" id="nacho-listas">0</div><div class="stat-label">Completadas</div></div>
       <div class="stat-card"><div class="stat-num orange" id="nacho-pend">0</div><div class="stat-label">Pendientes</div></div>
       <div class="stat-card"><div class="stat-num red" id="nacho-venc">0</div><div class="stat-label">Vencidas</div></div>
@@ -226,10 +225,10 @@ input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent);
       <button class="btn-export" id="export-nacho">Exportar CSV ↓</button>
     </div>
     <div class="table-card"><div class="table-wrap">
-      <table><colgroup><col style="width:32px"><col class="ck"><col class="ct"><col class="cf"><col class="cp"><col class="ce"><col class="ca"></colgroup>
-      <thead><tr><th></th><th class="center">✓</th><th>Tarea</th><th>Entrega</th><th>Prioridad</th><th>Estado</th><th></th></tr></thead>
+      <table><colgroup><col class="co"><col class="ck"><col class="ct"><col class="cf"><col class="cp"><col class="ce"><col class="ca"></colgroup>
+      <thead><tr><th class="center">#</th><th class="center">✓</th><th>Tarea</th><th>Entrega</th><th>Prioridad</th><th>Estado</th><th></th></tr></thead>
       <tbody id="tbody-nacho"></tbody></table>
-      <div class="empty-state" id="empty-nacho" style="display:none">No hay tareas en esta vista.</div>
+      <div class="empty-state" id="empty-nacho" style="display:none">No hay tareas.</div>
     </div></div>
   </main>
 </div>
@@ -248,128 +247,155 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+const db  = getFirestore(app);
 
 let tasks = [];
 let filters = { mary: 'pendientes', nacho: 'pendientes' };
 let currentPage = 'home';
 
-// ---- utilidades ----
+/* ── utilidades ── */
 const today = () => new Date().toISOString().slice(0,10);
-const isV = t => !(!t.fecha || t.done) && t.fecha < today();
-const fmt = s => { if (!s) return '—'; const [y,m,d] = s.split('-'); return `${d}/${m}/${y}`; };
-const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-const estadoBadge = t => t.done ? '<span class="badge badge-listo">Listo</span>' : isV(t) ? '<span class="badge badge-vencida">Vencida</span>' : '<span class="badge badge-pendiente">Pendiente</span>';
-const prioBadge = p => { const m={alta:'badge-alta',media:'badge-media',baja:'badge-baja'}; const l={alta:'Alta',media:'Media',baja:'Baja'}; return `<span class="badge ${m[p]||'badge-media'}">${l[p]||p}</span>`; };
+const isV   = t => !(!t.fecha || t.done) && t.fecha < today();
+const fmt   = s => { if (!s) return '—'; const [y,m,d]=s.split('-'); return `${d}/${m}/${y}`; };
+const esc   = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const estadoBadge = t => t.done
+  ? '<span class="badge badge-listo">Listo</span>'
+  : isV(t) ? '<span class="badge badge-vencida">Vencida</span>'
+  : '<span class="badge badge-pendiente">Pendiente</span>';
+const prioBadge = p => {
+  const m={alta:'badge-alta',media:'badge-media',baja:'badge-baja'};
+  const l={alta:'Alta',media:'Media',baja:'Baja'};
+  return `<span class="badge ${m[p]||'badge-media'}">${l[p]||p}</span>`;
+};
 
-// ---- navegación ----
+/* ── ordenar ── */
+function getSorted(key, resp) {
+  const f = filters[key];
+  return tasks
+    .filter(t => t.resp === resp)
+    .filter(t => {
+      if (f==='listas')    return t.done;
+      if (f==='pendientes') return !t.done && !isV(t);
+      if (f==='vencidas')  return isV(t);
+      return true;
+    })
+    .sort((a,b) => {
+      const ao = (a.orden !== null && a.orden !== undefined) ? Number(a.orden) : 99999;
+      const bo = (b.orden !== null && b.orden !== undefined) ? Number(b.orden) : 99999;
+      if (ao !== bo) return ao - bo;
+      if (!a.fecha && !b.fecha) return 0;
+      if (!a.fecha) return 1; if (!b.fecha) return -1;
+      const da = a.fecha+(a.hora||'00:00'), db2 = b.fecha+(b.hora||'00:00');
+      return da < db2 ? -1 : da > db2 ? 1 : 0;
+    });
+}
+
+/* ── navegación ── */
 function goTo(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('pg-'+id).classList.add('active');
   window.scrollTo(0,0);
   currentPage = id;
-  if (id === 'mary') renderPersona('mary','María Balestrini');
-  if (id === 'nacho') renderPersona('nacho','Ignacio Ríos');
-  if (id === 'home') renderHome();
+  if (id==='mary')  renderPersona('mary','María Balestrini');
+  if (id==='nacho') renderPersona('nacho','Ignacio Ríos');
+  if (id==='home')  renderHome();
 }
 
-// ---- render home ----
+/* ── render home ── */
 function renderHome() {
   [['mary','María Balestrini'],['nacho','Ignacio Ríos']].forEach(([key,resp]) => {
-    const mine = tasks.filter(t => t.resp === resp);
+    const mine = tasks.filter(t => t.resp===resp);
     const pend = mine.filter(t => !t.done && !isV(t)).length;
-    const alta = mine.filter(t => !t.done && t.prio === 'alta').length;
+    const alta = mine.filter(t => !t.done && t.prio==='alta').length;
     const ce = document.getElementById('home-'+key+'-count');
     const ue = document.getElementById('home-'+key+'-urgent');
-    if (ce) ce.textContent = pend + (pend===1?' pendiente':' pendientes');
-    if (ue) { if (alta>0){ue.textContent=alta+' urgente'+(alta>1?'s':'');ue.style.display='inline';}else{ue.style.display='none';} }
+    if (ce) ce.textContent = pend+(pend===1?' pendiente':' pendientes');
+    if (ue) { if(alta>0){ue.textContent=alta+' urgente'+(alta>1?'s':'');ue.style.display='inline';}else{ue.style.display='none';} }
   });
 }
 
-// ---- render persona ----
+/* ── render persona ── */
 function renderPersona(key, resp) {
-  const f = filters[key];
-  const mine = tasks.filter(t => t.resp === resp);
-  const tot=mine.length, lis=mine.filter(t=>t.done).length, ven=mine.filter(t=>isV(t)).length, pen=mine.filter(t=>!t.done&&!isV(t)).length;
-  document.getElementById(key+'-total').textContent = tot;
+  const mine = tasks.filter(t => t.resp===resp);
+  const tot=mine.length, lis=mine.filter(t=>t.done).length;
+  const ven=mine.filter(t=>isV(t)).length, pen=mine.filter(t=>!t.done&&!isV(t)).length;
+  document.getElementById(key+'-total').textContent  = tot;
   document.getElementById(key+'-listas').textContent = lis;
-  document.getElementById(key+'-pend').textContent = pen;
-  document.getElementById(key+'-venc').textContent = ven;
-  document.getElementById(key+'-sub').textContent = pen+' pendientes · '+lis+' completadas';
-  const vis = mine.filter(t => {
-    if (f==='listas') return t.done;
-    if (f==='pendientes') return !t.done && !isV(t);
-    if (f==='vencidas') return isV(t);
-    return true;
-  }).sort((a,b) => {
-    if (a.orden !== undefined && b.orden !== undefined) return a.orden - b.orden;
-    if (a.orden !== undefined) return -1;
-    if (b.orden !== undefined) return 1;
-    if (!a.fecha && !b.fecha) return 0;
-    if (!a.fecha) return 1; if (!b.fecha) return -1;
-    const da=a.fecha+(a.hora||'00:00'), db=b.fecha+(b.hora||'00:00');
-    return da<db?-1:da>db?1:0;
-  });
+  document.getElementById(key+'-pend').textContent   = pen;
+  document.getElementById(key+'-venc').textContent   = ven;
+  document.getElementById(key+'-sub').textContent    = pen+' pendientes · '+lis+' completadas';
+
+  const vis   = getSorted(key, resp);
   const tbody = document.getElementById('tbody-'+key);
   const empty = document.getElementById('empty-'+key);
+
   if (!vis.length) { tbody.innerHTML=''; empty.style.display='block'; return; }
   empty.style.display='none';
-  tbody.innerHTML = vis.map((t,idx) => {
+
+  tbody.innerHTML = vis.map(t => {
     const uid = t._id;
-    const v = isV(t);
-    const hd = t.desc && t.desc.trim();
-    return `<tr data-uid="${uid}" data-key="${key}">
-      <td class="center">
-        <input type="number" min="1" max="${vis.length}" value="${idx+1}"
-          data-uid="${uid}" data-action="reorder" data-key="${key}"
-          style="width:36px;font-family:'DM Mono',monospace;font-size:12px;text-align:center;border:0.5px solid var(--border);border-radius:4px;background:var(--bg);color:var(--text-muted);padding:2px 4px;outline:none">
-      </td>
-      <td class="center"><input type="checkbox" ${t.done?'checked':''} data-uid="${uid}" data-action="toggle"></td>
-      <td>
-        <span class="task-name ${t.done?'done-t':''}" contenteditable="true" data-uid="${uid}" data-field="tarea">${esc(t.tarea)}</span>
-        ${hd?`<div><button class="btn-expand" data-uid="${uid}" data-key="${key}">${t._open?'▴ ocultar':'▾ ver detalle'}</button></div>`:''}
-      </td>
-      <td>
-        <input type="date" value="${t.fecha||''}" data-uid="${uid}" data-field="fecha"
-          style="font-family:'DM Mono',monospace;font-size:12px;font-weight:500;border:none;background:transparent;color:${v?'var(--danger)':'var(--text)'};cursor:pointer;width:110px;outline:none;padding:0">
-        <input type="time" value="${t.hora||''}" data-uid="${uid}" data-field="hora"
-          style="font-family:'DM Mono',monospace;font-size:11px;border:none;background:transparent;color:var(--text-muted);cursor:pointer;width:80px;outline:none;padding:0;display:block;margin-top:2px">
-      </td>
-      <td>${prioBadge(t.prio)}</td>
-      <td>${estadoBadge(t)}</td>
-      <td><button class="btn-del" data-uid="${uid}" data-action="delete">×</button></td>
-    </tr>
-    ${hd?`<tr id="d-${key}-${uid}" data-desc-row="true" style="display:${t._open?'table-row':'none'}">
-      <td></td><td></td>
-      <td colspan="5" style="padding:0 14px 14px">
-        <div class="task-desc"><span contenteditable="true" data-uid="${uid}" data-field="desc">${esc(t.desc||'')}</span></div>
-      </td>
-    </tr>`:''}`;
+    const v   = isV(t);
+    const hd  = t.desc && t.desc.trim();
+    const ord = (t.orden !== null && t.orden !== undefined) ? t.orden : '';
+    return `
+<tr data-uid="${uid}">
+  <td class="center">
+    <input class="orden-inp" type="number" min="1" value="${esc(String(ord))}"
+      placeholder="—" title="Número de orden (menor = arriba)"
+      data-uid="${uid}" data-type="orden">
+  </td>
+  <td class="center"><input type="checkbox" ${t.done?'checked':''} data-uid="${uid}" data-type="toggle"></td>
+  <td>
+    <span class="task-name ${t.done?'done-t':''}" contenteditable="true"
+      data-uid="${uid}" data-type="field" data-field="tarea">${esc(t.tarea)}</span>
+    ${hd?`<div><button class="btn-expand" data-uid="${uid}" data-key="${key}">${t._open?'▴ ocultar':'▾ ver detalle'}</button></div>`:''}
+  </td>
+  <td>
+    <input type="date" value="${t.fecha||''}" data-uid="${uid}" data-type="field" data-field="fecha"
+      style="font-family:'DM Mono',monospace;font-size:12px;font-weight:500;border:none;background:transparent;color:${v?'var(--danger)':'var(--text)'};cursor:pointer;width:110px;outline:none;padding:0">
+    <input type="time" value="${t.hora||''}" data-uid="${uid}" data-type="field" data-field="hora"
+      style="font-family:'DM Mono',monospace;font-size:11px;border:none;background:transparent;color:var(--text-muted);cursor:pointer;width:80px;outline:none;padding:0;display:block;margin-top:2px">
+  </td>
+  <td>${prioBadge(t.prio)}</td>
+  <td>${estadoBadge(t)}</td>
+  <td><button class="btn-del" data-uid="${uid}" data-type="delete">×</button></td>
+</tr>
+${hd?`<tr id="d-${key}-${uid}" style="display:${t._open?'table-row':'none'}">
+  <td></td><td></td>
+  <td colspan="5" style="padding:0 14px 14px">
+    <div class="task-desc">
+      <span contenteditable="true" data-uid="${uid}" data-type="field" data-field="desc">${esc(t.desc||'')}</span>
+    </div>
+  </td>
+</tr>`:''}`;
   }).join('');
 }
 
-// ---- Firebase listener ----
+/* ── Firebase ── */
 const q = query(collection(db,'tareas'), orderBy('creadaEn','desc'));
 onSnapshot(q, snap => {
   tasks = snap.docs.map(d => ({_id:d.id,...d.data()}));
   renderHome();
-  if (currentPage==='mary') renderPersona('mary','María Balestrini');
+  if (currentPage==='mary')  renderPersona('mary','María Balestrini');
   if (currentPage==='nacho') renderPersona('nacho','Ignacio Ríos');
 });
 
-// ---- agregar tarea ----
+/* ── agregar tarea ── */
 async function addTask() {
   const tarea = document.getElementById('inp-tarea').value.trim();
   if (!tarea) { document.getElementById('inp-tarea').focus(); return; }
   try {
     await addDoc(collection(db,'tareas'), {
       tarea,
-      desc: document.getElementById('inp-desc').value.trim(),
-      resp: document.getElementById('inp-resp').value,
+      desc:  document.getElementById('inp-desc').value.trim(),
+      resp:  document.getElementById('inp-resp').value,
       fecha: document.getElementById('inp-fecha').value,
-      hora: document.getElementById('inp-hora').value,
-      prio: document.getElementById('inp-prio').value,
-      done: false, _open: false, creadaEn: Date.now()
+      hora:  document.getElementById('inp-hora').value,
+      prio:  document.getElementById('inp-prio').value,
+      orden: null,
+      done:  false,
+      _open: false,
+      creadaEn: Date.now()
     });
     ['inp-tarea','inp-desc','inp-fecha','inp-hora'].forEach(id => document.getElementById(id).value='');
     document.getElementById('inp-resp').value='';
@@ -377,106 +403,111 @@ async function addTask() {
   } catch(e) { alert('Error al agregar: '+e.message); }
 }
 
-// ---- exportar CSV ----
+/* ── exportar CSV ── */
 function exportCSV(resp) {
-  const mine = tasks.filter(t => t.resp===resp);
-  const rows = [['Tarea','Descripción','Fecha entrega','Hora','Prioridad','Estado']];
-  mine.forEach(t => rows.push([t.tarea,t.desc||'',t.fecha||'',t.hora||'',t.prio,t.done?'Listo':isV(t)?'Vencida':'Pendiente']));
+  const mine = tasks.filter(t=>t.resp===resp);
+  const rows = [['#','Tarea','Descripción','Fecha','Hora','Prioridad','Estado']];
+  mine.forEach(t => rows.push([
+    t.orden??'', t.tarea, t.desc||'', t.fecha||'', t.hora||'',
+    t.prio, t.done?'Listo':isV(t)?'Vencida':'Pendiente'
+  ]));
   const csv = rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
   const a = document.createElement('a');
-  a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);
-  a.download='tareas-'+resp.split(' ')[0].toLowerCase()+'.csv';
+  a.href = 'data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);
+  a.download = 'tareas-'+resp.split(' ')[0].toLowerCase()+'.csv';
   a.click();
 }
 
-// ---- event listeners (sin onclick en HTML) ----
+/* ── listeners globales ── */
 document.getElementById('btn-agregar').addEventListener('click', addTask);
-document.getElementById('inp-tarea').addEventListener('keydown', e => { if(e.key==='Enter') addTask(); });
-document.getElementById('folder-mary').addEventListener('click', () => goTo('mary'));
-document.getElementById('folder-nacho').addEventListener('click', () => goTo('nacho'));
-document.getElementById('back-mary').addEventListener('click', () => goTo('home'));
-document.getElementById('back-nacho').addEventListener('click', () => goTo('home'));
-document.getElementById('export-mary').addEventListener('click', () => exportCSV('María Balestrini'));
-document.getElementById('export-nacho').addEventListener('click', () => exportCSV('Ignacio Ríos'));
+document.getElementById('inp-tarea').addEventListener('keydown', e=>{ if(e.key==='Enter') addTask(); });
+document.getElementById('folder-mary').addEventListener('click',  ()=>goTo('mary'));
+document.getElementById('folder-nacho').addEventListener('click', ()=>goTo('nacho'));
+document.getElementById('back-mary').addEventListener('click',   ()=>goTo('home'));
+document.getElementById('back-nacho').addEventListener('click',  ()=>goTo('home'));
+document.getElementById('export-mary').addEventListener('click',  ()=>exportCSV('María Balestrini'));
+document.getElementById('export-nacho').addEventListener('click', ()=>exportCSV('Ignacio Ríos'));
 
-// Filtros Mary
-document.getElementById('filters-mary').addEventListener('click', e => {
-  const btn = e.target.closest('.filter-btn');
-  if (!btn) return;
+document.getElementById('filters-mary').addEventListener('click', e=>{
+  const btn=e.target.closest('.filter-btn'); if(!btn)return;
   document.querySelectorAll('#filters-mary .filter-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  filters.mary = btn.dataset.f;
+  btn.classList.add('active'); filters.mary=btn.dataset.f;
   renderPersona('mary','María Balestrini');
 });
-
-// Filtros Nacho
-document.getElementById('filters-nacho').addEventListener('click', e => {
-  const btn = e.target.closest('.filter-btn');
-  if (!btn) return;
+document.getElementById('filters-nacho').addEventListener('click', e=>{
+  const btn=e.target.closest('.filter-btn'); if(!btn)return;
   document.querySelectorAll('#filters-nacho .filter-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  filters.nacho = btn.dataset.f;
+  btn.classList.add('active'); filters.nacho=btn.dataset.f;
   renderPersona('nacho','Ignacio Ríos');
 });
 
-// Delegación de eventos en tablas
+/* ── listeners de tabla — UN solo bloque por tabla ── */
 ['tbody-mary','tbody-nacho'].forEach(tbodyId => {
-  const key = tbodyId.replace('tbody-','');
-  const resp = key==='mary'?'María Balestrini':'Ignacio Ríos';
-  document.getElementById(tbodyId).addEventListener('click', async e => {
-    // Toggle checkbox
-    const cb = e.target.closest('input[data-action="toggle"]');
+  const key  = tbodyId.replace('tbody-','');
+  const resp = key==='mary' ? 'María Balestrini' : 'Ignacio Ríos';
+  const tbody = document.getElementById(tbodyId);
+
+  /* CLICK */
+  tbody.addEventListener('click', async e => {
+    /* toggle */
+    const cb = e.target.closest('[data-type="toggle"]');
     if (cb) {
       const t = tasks.find(t=>t._id===cb.dataset.uid);
-      if (t) await updateDoc(doc(db,'tareas',t._id),{done:!t.done});
+      if (t) await updateDoc(doc(db,'tareas',t._id), {done:!t.done});
       return;
     }
-    // Eliminar
-    const del = e.target.closest('button[data-action="delete"]');
-    if (del) {
-      if (confirm('¿Eliminar esta tarea?')) await deleteDoc(doc(db,'tareas',del.dataset.uid));
+    /* eliminar */
+    const dl = e.target.closest('[data-type="delete"]');
+    if (dl) {
+      if (confirm('¿Eliminar esta tarea?')) await deleteDoc(doc(db,'tareas',dl.dataset.uid));
       return;
     }
-    // Ver detalle
-    const exp = e.target.closest('.btn-expand');
-    if (exp) {
-      const uid = exp.dataset.uid;
-      const k = exp.dataset.key;
-      const t = tasks.find(t=>t._id===uid);
-      if (!t) return;
-      t._open = !t._open;
-      const row = document.getElementById('d-'+k+'-'+uid);
-      if (row) row.style.display = t._open?'table-row':'none';
-      exp.textContent = t._open?'▴ ocultar':'▾ ver detalle';
+    /* ver detalle */
+    const ex = e.target.closest('.btn-expand');
+    if (ex) {
+      const uid=ex.dataset.uid, k=ex.dataset.key;
+      const t=tasks.find(t=>t._id===uid); if(!t) return;
+      t._open=!t._open;
+      const row=document.getElementById('d-'+k+'-'+uid);
+      if(row) row.style.display=t._open?'table-row':'none';
+      ex.textContent=t._open?'▴ ocultar':'▾ ver detalle';
     }
   });
-  // Editar campos en línea
-  document.getElementById(tbodyId).addEventListener('blur', async e => {
-    const el = e.target.closest('[data-field]');
-    if (!el) return;
-    await updateDoc(doc(db,'tareas',el.dataset.uid),{[el.dataset.field]:el.innerText.trim()});
+
+  /* BLUR — solo spans contenteditable (tarea, desc) */
+  tbody.addEventListener('blur', async e => {
+    const el = e.target;
+    if (el.dataset.type !== 'field') return;    // solo data-type="field"
+    if (el.tagName === 'INPUT') return;          // fecha/hora se manejan con change
+    const uid   = el.dataset.uid;
+    const field = el.dataset.field;
+    await updateDoc(doc(db,'tareas',uid), {[field]: el.innerText.trim()});
   }, true);
-  document.getElementById(tbodyId).addEventListener('change', async e => {
-    const el = e.target.closest('input[data-field]');
-    if (!el) return;
-    await updateDoc(doc(db,'tareas',el.dataset.uid),{[el.dataset.field]:el.value});
-  });
-});
-// ---- reorden numérico ----
-['tbody-mary','tbody-nacho'].forEach(tbodyId => {
-  const key = tbodyId.replace('tbody-','');
-  const resp = key==='mary'?'María Balestrini':'Ignacio Ríos';
-  document.getElementById(tbodyId).addEventListener('change', async e => {
-    const inp = e.target.closest('input[data-action="reorder"]');
-    if (!inp) return;
-    const uid = inp.dataset.uid;
-    const newPos = parseInt(inp.value) - 1;
-    const mine = tasks.filter(t => t.resp === resp && (!filters[key] || (filters[key]==='pendientes'?(!t.done&&!isV(t)):filters[key]==='listas'?t.done:filters[key]==='vencidas'?isV(t):true)));
-    const srcIdx = mine.findIndex(t => t._id === uid);
-    if (srcIdx < 0 || newPos < 0 || newPos >= mine.length || newPos === srcIdx) return;
-    const [moved] = mine.splice(srcIdx, 1);
-    mine.splice(newPos, 0, moved);
-    await Promise.all(mine.map((t,i) => updateDoc(doc(db,'tareas',t._id),{orden:i})));
+
+  /* CHANGE — fecha, hora y número de orden (un solo listener) */
+  tbody.addEventListener('change', async e => {
+    const el = e.target;
+    /* fecha / hora */
+    if (el.dataset.type === 'field' && (el.dataset.field==='fecha' || el.dataset.field==='hora')) {
+      await updateDoc(doc(db,'tareas',el.dataset.uid), {[el.dataset.field]: el.value});
+      return;
+    }
+    /* orden */
+    if (el.dataset.type === 'orden') {
+      const uid = el.dataset.uid;
+      const val = el.value.trim()==='' ? null : Number(el.value);
+      if (val === null) {
+        await updateDoc(doc(db,'tareas',uid), {orden: null});
+        return;
+      }
+      // Reasignar orden evitando repetidos
+      const mine = tasks.filter(t => t.resp===resp && t._id!==uid).filter(t => t.orden!==null && t.orden!==undefined);
+      mine.sort((a,b) => Number(a.orden)-Number(b.orden));
+      // Insertar la tarea en la posición pedida y renumerar desde 1
+      mine.splice(val-1, 0, {_id: uid});
+      const updates = mine.map((t,i) => updateDoc(doc(db,'tareas',t._id), {orden: i+1}));
+      await Promise.all(updates);
+    }
   });
 });
 </script>
